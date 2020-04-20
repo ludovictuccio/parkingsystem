@@ -11,10 +11,10 @@ public class FareCalculatorService {
     public void calculateFare(Ticket ticket) {
 
 	if ((ticket.getOutTime() == null)) {
-	    throw new IllegalArgumentException("Out time provided is incorrect null pointer exception");
+	    throw new NullPointerException("Out time provided is incorrect null pointer exception");
 	}
 	if (ticket.getOutTime().compareTo(ticket.getInTime()) < 0) {
-	    throw new IllegalArgumentException("Out time provided is incorrect:" + ticket.getOutTime().toString());
+	    throw new NullPointerException("Out time provided is incorrect:" + ticket.getOutTime().toString());
 	}
 	LocalDateTime inHour = ticket.getInTime();
 	LocalDateTime outHour = ticket.getOutTime();

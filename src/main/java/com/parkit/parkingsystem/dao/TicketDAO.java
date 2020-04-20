@@ -3,7 +3,7 @@ package com.parkit.parkingsystem.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,8 +17,7 @@ import com.parkit.parkingsystem.model.Ticket;
 public class TicketDAO {
 
     private static final Logger logger = LogManager.getLogger("TicketDAO");
-    private LocalDateTime inTime = LocalDateTime.now();
-    private LocalDateTime outTime = LocalDateTime.now();
+
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
     public boolean saveTicket(Ticket ticket) {
@@ -32,27 +31,17 @@ public class TicketDAO {
 	    ps.setInt(1, ticket.getParkingSpot().getId());
 	    ps.setString(2, ticket.getVehicleRegNumber());
 	    ps.setDouble(3, ticket.getPrice());
-
-	    inTime = ticket.getInTime();
-	    ps.setObject(4, inTime.getMinute());
-
-	    outTime = ticket.getOutTime();
-	    ps.setObject(5, outTime.getMinute());
-
-	    // ps.setObject(5, (ticket.getOutTime() == null) ? null : (new
-	    // Timestamp(ticket.getOutTime().toMillis())));
-
-	    // ps.setTimestamp(5, (ticket.getOutTime() == null) ? null : (new
-	    // Timestamp(ticket.getOutTime().toMillis())));
-
+	    ps.setTimestamp(4, Timestamp.valueOf(ticket.getInTime()));
+	    ps.setTimestamp(5, (ticket.getOutTime() == null) ? null : (Timestamp.valueOf(ticket.getOutTime())));
 	    return ps.execute();
 
 	} catch (Exception ex) {
 	    logger.error("Error fetching next available slot", ex);
 	} finally {
 	    dataBaseConfig.closeConnection(con);
-	    return false;
+
 	}
+	return false;
     }
 
     public Ticket getTicket(String vehicleRegNumber) {
@@ -71,15 +60,8 @@ public class TicketDAO {
 		ticket.setId(rs.getInt(2));
 		ticket.setVehicleRegNumber(vehicleRegNumber);
 		ticket.setPrice(rs.getDouble(3));
-
-		inTime = ticket.getInTime();
-		java.sql.Timestamp.valueOf(inTime).getTime();
-
-		outTime = ticket.getInTime();
-		java.sql.Timestamp.valueOf(outTime);
-
-//		ticket.setInTime(rs.getTimestamp(4));
-//		ticket.setOutTime(rs.getTimestamp(5));
+		ticket.setInTime(rs.getTimestamp(4).toLocalDateTime());
+		ticket.setOutTime(rs.getTimestamp(5).toLocalDateTime());
 	    }
 	    dataBaseConfig.closeResultSet(rs);
 	    dataBaseConfig.closePreparedStatement(ps);
@@ -87,8 +69,9 @@ public class TicketDAO {
 	    logger.error("Error fetching next available slot", ex);
 	} finally {
 	    dataBaseConfig.closeConnection(con);
-	    return ticket;
+
 	}
+	return ticket;
     }
 
     public boolean updateTicket(Ticket ticket) {
@@ -97,11 +80,7 @@ public class TicketDAO {
 	    con = dataBaseConfig.getConnection();
 	    PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_TICKET);
 	    ps.setDouble(1, ticket.getPrice());
-
-	    // ps.setTimestamp(2, new Timestamp(ticket.getOutTime().getTime()));
-	    outTime = ticket.getOutTime();
-	    ps.setObject(2, outTime.getMinute());
-
+	    ps.setTimestamp(2, Timestamp.valueOf(ticket.getOutTime()));
 	    ps.setInt(3, ticket.getId());
 	    ps.execute();
 	    return true;
