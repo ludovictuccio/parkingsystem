@@ -39,16 +39,16 @@ public class InteractiveShell {
 		break;
 	    }
 	    default:
-		logger.info("Unsupported option. Please enter a number corresponding to the provided menu");
+		logger.error("Unsupported option. Please enter a number corresponding to the provided menu");
 	    }
 	}
     }
 
     private static void loadMenu() {
-	logger.info("Please select an option. Simply enter the number to choose an action");
-	logger.info("1 New Vehicle Entering - Allocate Parking Space");
-	logger.info("2 Vehicle Exiting - Generate Ticket Price");
-	logger.info("3 Shutdown System");
+	System.out.println("Please select an option. Simply enter the number to choose an action");
+	System.out.println("1 New Vehicle Entering - Allocate Parking Space");
+	System.out.println("2 Vehicle Exiting - Generate Ticket Price");
+	System.out.println("3 Shutdown System");
     }
 
 }

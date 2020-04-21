@@ -47,6 +47,7 @@ public class FareCalculatorService {
 		ticket.setPrice(durationOfTicket.toHours() * Fare.CAR_RATE_PER_HOUR);
 	    }
 	    break;
+
 	}
 	case BIKE: {
 

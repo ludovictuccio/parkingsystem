@@ -12,13 +12,6 @@
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<!-- General informations -->
-	<name>Park'it</name>
-	<description>
-	Parking Ticket System
-	</description>
-	<url>https://github.com/ludovictuccio/parkingsystem</url>
-
 	<!-- Organization -->
 	<organization>
 		<name>Move'it</name>
@@ -32,6 +25,10 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
 		<dep.apache.version>2.13.1</dep.apache.version>
+		<sonar.projectKey>ludovictuccio_parkingsystem</sonar.projectKey>
+		<sonar.organization>ludovictuccio</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		<sonar.login>7977aa11c8d3990f6d0e2233087668e12066dcd3</sonar.login>
 	</properties>
 
 	<!-- ======================================================= -->
@@ -75,6 +72,11 @@
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-assembly-plugin</artifactId>
 			<version>3.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-project-info-reports-plugin</artifactId>
+			<version>3.0.0</version>
 		</dependency>
 	</dependencies>
 
@@ -121,7 +123,7 @@
 						</goals>
 					</execution>
 					<execution>
-						<id>jacoco-report</id>
+						<id>report</id>
 						<phase>test</phase>
 						<goals>
 							<goal>report</goal>

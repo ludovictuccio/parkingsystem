@@ -13,8 +13,8 @@ import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.model.ParkingSpot;
 
 public class ParkingSpotDAO {
-    private static final Logger logger = LogManager.getLogger("ParkingSpotDAO");
 
+    private static final Logger logger = LogManager.getLogger("ParkingSpotDAO");
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
     public int getNextAvailableSlot(ParkingType parkingType) {
@@ -53,7 +53,6 @@ public class ParkingSpotDAO {
 	    ps.setBoolean(1, parkingSpot.isAvailable());
 	    ps.setInt(2, parkingSpot.getId());
 	    int updateRowCount = ps.executeUpdate();
-	    dataBaseConfig.closePreparedStatement(ps);
 	    return (updateRowCount == 1);
 	} catch (Exception ex) {
 	    logger.error("Error updating parking info", ex);

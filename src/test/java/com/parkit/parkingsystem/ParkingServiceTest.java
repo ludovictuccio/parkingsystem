@@ -26,6 +26,7 @@ import com.parkit.parkingsystem.util.InputReaderUtil;
 public class ParkingServiceTest {
 
     private static ParkingService parkingService;
+    LocalDateTime loc = LocalDateTime.now();
 
     @Mock
     private static InputReaderUtil inputReaderUtil;
@@ -41,15 +42,7 @@ public class ParkingServiceTest {
 
 	    ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
 	    Ticket ticket = new Ticket();
-
-	    // LocalDateTime inTime = LocalDateTime.now();
-
-	    LocalDateTime loc = ticket.getInTime();
-	    LocalDateTime locTest = loc.minusHours(1);
-	    ticket.setInTime(locTest);
-
-	    // ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
-
+	    ticket.setInTime(loc.minusHours(1));
 	    ticket.setParkingSpot(parkingSpot);
 	    ticket.setVehicleRegNumber("ABCDEF");
 	    when(ticketDAO.getTicket(anyString())).thenReturn(ticket);

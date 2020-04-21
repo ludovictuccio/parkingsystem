@@ -92,7 +92,7 @@ public class ParkingService {
 	    return ParkingType.BIKE;
 	}
 	default: {
-	    System.out.println("Incorrect input provided");
+	    logger.error("Incorrect input provided");
 	    throw new IllegalArgumentException("Entered input is invalid");
 	}
 	}
@@ -112,7 +112,7 @@ public class ParkingService {
 		logger.info("Please pay the parking fare:" + ticket.getPrice());
 		logger.info("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
 	    } else {
-		logger.info("Unable to update ticket information. Error occurred");
+		logger.error("Unable to update ticket information. Error occurred");
 	    }
 	} catch (Exception e) {
 	    logger.error("Unable to process exiting vehicle", e);
