@@ -1,15 +1,16 @@
 package com.parkit.parkingsystem.service;
 
+import java.time.LocalDateTime;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.util.InputReaderUtil;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.util.Date;
 
 public class ParkingService {
 
@@ -19,12 +20,12 @@ public class ParkingService {
 
     private InputReaderUtil inputReaderUtil;
     private ParkingSpotDAO parkingSpotDAO;
-    private  TicketDAO ticketDAO;
+    private TicketDAO ticketDAO;
 
-    public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO){
-        this.inputReaderUtil = inputReaderUtil;
-        this.parkingSpotDAO = parkingSpotDAO;
-        this.ticketDAO = ticketDAO;
+    public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO) {
+	this.inputReaderUtil = inputReaderUtil;
+	this.parkingSpotDAO = parkingSpotDAO;
+	this.ticketDAO = ticketDAO;
     }
 
     public void processIncomingVehicle() {
@@ -59,23 +60,23 @@ public class ParkingService {
 	return inputReaderUtil.readVehicleRegistrationNumber();
     }
 
-    public ParkingSpot getNextParkingNumberIfAvailable(){
-        int parkingNumber=0;
-        ParkingSpot parkingSpot = null;
-        try{
-            ParkingType parkingType = getVehichleType();
-            parkingNumber = parkingSpotDAO.getNextAvailableSlot(parkingType);
-            if(parkingNumber > 0){
-                parkingSpot = new ParkingSpot(parkingNumber,parkingType, true);
-            }else{
-                throw new Exception("Error fetching parking number from DB. Parking slots might be full");
-            }
-        }catch(IllegalArgumentException ie){
-            logger.error("Error parsing user input for type of vehicle", ie);
-        }catch(Exception e){
-            logger.error("Error fetching next available parking slot", e);
-        }
-        return parkingSpot;
+    public ParkingSpot getNextParkingNumberIfAvailable() {
+	int parkingNumber = 0;
+	ParkingSpot parkingSpot = null;
+	try {
+	    ParkingType parkingType = getVehichleType();
+	    parkingNumber = parkingSpotDAO.getNextAvailableSlot(parkingType);
+	    if (parkingNumber > 0) {
+		parkingSpot = new ParkingSpot(parkingNumber, parkingType, true);
+	    } else {
+		throw new Exception("Error fetching parking number from DB. Parking slots might be full");
+	    }
+	} catch (IllegalArgumentException ie) {
+	    logger.error("Error parsing user input for type of vehicle", ie);
+	} catch (Exception e) {
+	    logger.error("Error fetching next available parking slot", e);
+	}
+	return parkingSpot;
     }
 
     private ParkingType getVehichleType() {

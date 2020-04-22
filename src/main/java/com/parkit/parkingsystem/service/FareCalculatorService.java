@@ -1,31 +1,69 @@
 package com.parkit.parkingsystem.service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.model.Ticket;
 
 public class FareCalculatorService {
 
-    public void calculateFare(Ticket ticket){
-        if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){
-            throw new IllegalArgumentException("Out time provided is incorrect:"+ticket.getOutTime().toString());
-        }
+    public void calculateFare(Ticket ticket) {
 
-        int inHour = ticket.getInTime().getHours();
-        int outHour = ticket.getOutTime().getHours();
+	if ((ticket.getOutTime() == null)) {
+	    throw new NullPointerException("Out time provided is incorrect null pointer exception");
+	}
+	if (ticket.getOutTime().compareTo(ticket.getInTime()) < 0) {
+	    throw new NullPointerException("Out time provided is incorrect:" + ticket.getOutTime().toString());
+	}
+	LocalDateTime inHour = ticket.getInTime();
+	LocalDateTime outHour = ticket.getOutTime();
+	Duration durationOfTicket = Duration.between(inHour, outHour);
 
-        //TODO: Some tests are failing here. Need to check if this logic is correct
-        int duration = outHour - inHour;
+	LocalDateTime afterHour = inHour.plusHours(1);// Hours thresholds after receipt of the ticket
+	LocalDateTime afterThreeQuartersOfHour = inHour.plusMinutes(45);
 
-        switch (ticket.getParkingSpot().getParkingType()){
-            case CAR: {
-                ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);
-                break;
-            }
-            case BIKE: {
-                ticket.setPrice(duration * Fare.BIKE_RATE_PER_HOUR);
-                break;
-            }
-            default: throw new IllegalArgumentException("Unkown Parking Type");
-        }
+	// outHour <= afterHour && outHour > afterQuartersOfHour
+	Boolean testBetweenThreeQuartersAndHours = (outHour.isBefore(afterHour) || outHour.isEqual(afterHour))
+		&& outHour.isAfter(afterThreeQuartersOfHour);
+
+	// outHour <= afterQuartersOfHour
+	Boolean testLessThreeQuarters = outHour.isBefore(afterThreeQuartersOfHour)
+		|| outHour.isEqual(afterThreeQuartersOfHour);
+
+	// outHour > afterHour
+	Boolean testMoreHour = outHour.isAfter(afterHour);
+
+	switch (ticket.getParkingSpot().getParkingType()) {
+	case CAR: {
+
+	    if (testBetweenThreeQuartersAndHours) {
+		ticket.setPrice(1 * Fare.CAR_RATE_PER_HOUR);
+
+	    } else if (testLessThreeQuarters) {
+		ticket.setPrice(0.75 * Fare.CAR_RATE_PER_HOUR);
+
+	    } else if (testMoreHour) {
+		ticket.setPrice(durationOfTicket.toHours() * Fare.CAR_RATE_PER_HOUR);
+	    }
+	    break;
+
+	}
+	case BIKE: {
+
+	    if (testBetweenThreeQuartersAndHours) {
+		ticket.setPrice(1 * Fare.BIKE_RATE_PER_HOUR);
+
+	    } else if (testLessThreeQuarters) {
+		ticket.setPrice(0.75 * Fare.BIKE_RATE_PER_HOUR);
+
+	    } else if (testMoreHour) {
+		ticket.setPrice(durationOfTicket.toHours() * Fare.BIKE_RATE_PER_HOUR);
+	    }
+	    break;
+	}
+	default:
+	    throw new IllegalArgumentException("Unkown Parking Type");
+	}
     }
 }

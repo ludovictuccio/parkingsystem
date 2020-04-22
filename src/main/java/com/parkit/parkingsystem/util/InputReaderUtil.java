@@ -1,14 +1,15 @@
 package com.parkit.parkingsystem.util;
 
+import java.util.Scanner;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Scanner;
-
 public class InputReaderUtil {
 
-    private static Scanner scan = new Scanner(System.in);
+    private Scanner scan = new Scanner(System.in);
     private static final Logger logger = LogManager.getLogger("InputReaderUtil");
+    private static final String ERROR_MESSAGE = "Error while reading user input from Shell";
 
     public int readSelection() {
 	try {
@@ -35,6 +36,5 @@ public class InputReaderUtil {
 	    throw e;
 	}
     }
-
 
 }
