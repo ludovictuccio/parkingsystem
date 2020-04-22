@@ -46,6 +46,55 @@ public class FareCalculatorServiceTest {
     }
 
     @Test
+    @DisplayName("CAR (regular client) - calculate fare")
+    public void calculateFareCarForRegularClient() {
+	ticket.setOutTime(ticket.getInTime().plusHours(1));
+	fareCalculatorService.calculateFare(ticket);
+	assertThat(0.95 * Fare.CAR_RATE_PER_HOUR).isEqualTo(ticket.getPrice());
+    }
+
+    @Test
+    @DisplayName("CAR - 45 minutes parking time should give 3/4th parking fare")
+    public void calculateFareCarWithLessThanOneHourParkingTime() {
+	ticket.setOutTime(ticket.getInTime().plusMinutes(45));
+	fareCalculatorService.calculateFare(ticket);
+	assertThat(ticket.getPrice()).isEqualTo(0.75 * Fare.CAR_RATE_PER_HOUR);
+    }
+
+    @Test
+    @DisplayName("CAR (regular client) - 45 minutes parking ")
+    public void calculateFareCarWithLessThanOneHourParkingTimeForRegularClient() {
+	ticket.setOutTime(ticket.getInTime().plusMinutes(45));
+	fareCalculatorService.calculateFare(ticket);
+	assertThat(0.95 * ticket.getPrice()).isEqualTo(0.75 * Fare.CAR_RATE_PER_HOUR);
+    }
+
+    @Test
+    @DisplayName("CAR - 24 hours parking time should give 24 * parking fare per hour")
+    public void calculateFareCarWithMoreThanADayParkingTime() {
+	ticket.setOutTime(ticket.getInTime().plusDays(1));
+	fareCalculatorService.calculateFare(ticket);
+	assertThat(ticket.getPrice()).isEqualTo(24 * Fare.CAR_RATE_PER_HOUR);
+    }
+
+    @Test
+    @DisplayName("CAR (regular client) - 24 hours parking")
+    public void calculateFareCarWithMoreThanADayParkingTimeForRegularClient() {
+	ticket.setOutTime(ticket.getInTime().plusDays(1));
+	fareCalculatorService.calculateFare(ticket);
+	assertThat(ticket.getPrice()).isEqualTo(24 * (0.95 * Fare.CAR_RATE_PER_HOUR));
+    }
+
+    @Test
+    @DisplayName("CAR - exception")
+    public void exceptionCalculateFareCarWithFutureInTime() {
+	parkingSpot.setParkingType(ParkingType.CAR);
+	assertThatNullPointerException().isThrownBy(() -> {
+	    fareCalculatorService.calculateFare(ticket);
+	});
+    }
+
+    @Test
     @DisplayName("BIKE - calculate fare")
     public void calculateFareBike() {
 	ticket.setOutTime(ticket.getInTime().plusHours(1));
@@ -55,23 +104,12 @@ public class FareCalculatorServiceTest {
     }
 
     @Test
-    @DisplayName("UnknowType - calculate fare")
-    public void calculateFareUnkownType() {
+    @DisplayName("BIKE (regular client) - calculate fare")
+    public void calculateFareBikeForRegularClient() {
 	ticket.setOutTime(ticket.getInTime().plusHours(1));
-	parkingSpot.setParkingType(null);
-	assertThatNullPointerException().isThrownBy(() -> {
-	    fareCalculatorService.calculateFare(ticket);
-	});
-    }
-
-    @Test
-    @DisplayName("BIKE - fare with future in time")
-    public void calculateFareBikeWithFutureInTime() {
 	parkingSpot.setParkingType(ParkingType.BIKE);
-	assertThatNullPointerException().isThrownBy(() -> {
-	    // assertThatIllegalArgumentException().isThrownBy(() -> {
-	    fareCalculatorService.calculateFare(ticket);
-	});
+	fareCalculatorService.calculateFare(ticket);
+	assertThat(0.95 * Fare.BIKE_RATE_PER_HOUR).isEqualTo(ticket.getPrice());
     }
 
     @Test
@@ -84,18 +122,31 @@ public class FareCalculatorServiceTest {
     }
 
     @Test
-    @DisplayName("CAR - 45 minutes parking time should give 3/4th parking fare")
-    public void calculateFareCarWithLessThanOneHourParkingTime() {
+    @DisplayName("BIKE (regular client) - 45 minutes parking ")
+    public void calculateFareBikeWithLessThanOneHourParkingTimeForRegularClient() {
 	ticket.setOutTime(ticket.getInTime().plusMinutes(45));
+	parkingSpot.setParkingType(ParkingType.BIKE);
 	fareCalculatorService.calculateFare(ticket);
-	assertThat(ticket.getPrice()).isEqualTo(0.75 * Fare.CAR_RATE_PER_HOUR);
+	assertThat(ticket.getPrice()).isEqualTo(0.75 * (0.95 * Fare.BIKE_RATE_PER_HOUR));
     }
 
     @Test
-    @DisplayName("CAR - 24 hours parking time should give 24 * parking fare per hour")
-    public void calculateFareCarWithMoreThanADayParkingTime() {
-	ticket.setOutTime(ticket.getInTime().plusDays(1));
-	fareCalculatorService.calculateFare(ticket);
-	assertThat(ticket.getPrice()).isEqualTo(24 * Fare.CAR_RATE_PER_HOUR);
+    @DisplayName("BIKE - exception")
+    public void calculateFareBikeWithFutureInTime() {
+	parkingSpot.setParkingType(ParkingType.BIKE);
+	assertThatNullPointerException().isThrownBy(() -> {
+	    fareCalculatorService.calculateFare(ticket);
+	});
     }
+
+    @Test
+    @DisplayName("UnknowType - calculate fare")
+    public void calculateFareUnkownType() {
+	ticket.setOutTime(ticket.getInTime().plusHours(1));
+	parkingSpot.setParkingType(null);
+	assertThatNullPointerException().isThrownBy(() -> {
+	    fareCalculatorService.calculateFare(ticket);
+	});
+    }
+
 }
