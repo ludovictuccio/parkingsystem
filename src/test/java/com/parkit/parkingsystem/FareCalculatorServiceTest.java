@@ -49,7 +49,7 @@ public class FareCalculatorServiceTest {
     @DisplayName("CAR (regular client) - calculate fare")
     public void calculateFareCarForRegularClient() {
 	ticket.setOutTime(ticket.getInTime().plusHours(1));
-	fareCalculatorService.calculateFare(ticket);
+	fareCalculatorService.calculateFareForRegularClient(ticket);
 	assertThat(0.95 * Fare.CAR_RATE_PER_HOUR).isEqualTo(ticket.getPrice());
     }
 
@@ -65,8 +65,8 @@ public class FareCalculatorServiceTest {
     @DisplayName("CAR (regular client) - 45 minutes parking ")
     public void calculateFareCarWithLessThanOneHourParkingTimeForRegularClient() {
 	ticket.setOutTime(ticket.getInTime().plusMinutes(45));
-	fareCalculatorService.calculateFare(ticket);
-	assertThat(0.95 * ticket.getPrice()).isEqualTo(0.75 * Fare.CAR_RATE_PER_HOUR);
+	fareCalculatorService.calculateFareForRegularClient(ticket);
+	assertThat(ticket.getPrice()).isEqualTo(0.75 * (0.95 * Fare.CAR_RATE_PER_HOUR));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class FareCalculatorServiceTest {
     @DisplayName("CAR (regular client) - 24 hours parking")
     public void calculateFareCarWithMoreThanADayParkingTimeForRegularClient() {
 	ticket.setOutTime(ticket.getInTime().plusDays(1));
-	fareCalculatorService.calculateFare(ticket);
+	fareCalculatorService.calculateFareForRegularClient(ticket);
 	assertThat(ticket.getPrice()).isEqualTo(24 * (0.95 * Fare.CAR_RATE_PER_HOUR));
     }
 
@@ -108,7 +108,7 @@ public class FareCalculatorServiceTest {
     public void calculateFareBikeForRegularClient() {
 	ticket.setOutTime(ticket.getInTime().plusHours(1));
 	parkingSpot.setParkingType(ParkingType.BIKE);
-	fareCalculatorService.calculateFare(ticket);
+	fareCalculatorService.calculateFareForRegularClient(ticket);
 	assertThat(0.95 * Fare.BIKE_RATE_PER_HOUR).isEqualTo(ticket.getPrice());
     }
 
@@ -126,7 +126,7 @@ public class FareCalculatorServiceTest {
     public void calculateFareBikeWithLessThanOneHourParkingTimeForRegularClient() {
 	ticket.setOutTime(ticket.getInTime().plusMinutes(45));
 	parkingSpot.setParkingType(ParkingType.BIKE);
-	fareCalculatorService.calculateFare(ticket);
+	fareCalculatorService.calculateFareForRegularClient(ticket);
 	assertThat(ticket.getPrice()).isEqualTo(0.75 * (0.95 * Fare.BIKE_RATE_PER_HOUR));
     }
 

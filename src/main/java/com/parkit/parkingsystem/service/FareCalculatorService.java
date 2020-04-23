@@ -8,7 +8,7 @@ import com.parkit.parkingsystem.model.Ticket;
 
 public class FareCalculatorService {
 
-    public void calculateFare(Ticket ticket) {
+    public void errorWhenVehiculeLeave(Ticket ticket) {
 
 	if ((ticket.getOutTime() == null)) {
 	    throw new NullPointerException("Out time provided is incorrect null pointer exception");
@@ -16,6 +16,22 @@ public class FareCalculatorService {
 	if (ticket.getOutTime().compareTo(ticket.getInTime()) < 0) {
 	    throw new NullPointerException("Out time provided is incorrect:" + ticket.getOutTime().toString());
 	}
+    }
+
+    public void calculateFareForRegularClient(Ticket ticket) {
+
+	errorWhenVehiculeLeave(ticket);
+
+	calculateFare(ticket);
+
+	ticket.setPrice(0.95 * ticket.getPrice());
+
+    }
+
+    public void calculateFare(Ticket ticket) {
+
+	errorWhenVehiculeLeave(ticket);
+
 	LocalDateTime inHour = ticket.getInTime();
 	LocalDateTime outHour = ticket.getOutTime();
 	Duration durationOfTicket = Duration.between(inHour, outHour);
