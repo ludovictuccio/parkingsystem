@@ -17,7 +17,7 @@ public class InputReaderUtil {
 	    return input;
 	} catch (Exception e) {
 	    logger.error(ERROR_MESSAGE, e);
-	    System.out.println("Error reading input. Please enter valid number for proceeding further");
+	    logger.error("Error reading input. Please enter valid number for proceeding further");
 	    return -1;
 	}
     }
@@ -32,7 +32,7 @@ public class InputReaderUtil {
 	    return vehicleRegNumber;
 	} catch (Exception e) {
 	    logger.error(ERROR_MESSAGE, e);
-	    System.out.println("Error reading input. Please enter a valid string for vehicle registration number");
+	    logger.error("Error reading input. Please enter a valid string for vehicle registration number");
 	    throw e;
 	}
     }
