@@ -8,7 +8,7 @@ import com.parkit.parkingsystem.model.Ticket;
 
 public class FareCalculatorService {
 
-    public void errorWhenVehiculeLeave(Ticket ticket) {
+    public void checkErrorsWhenVehiculeIsExitingParking(Ticket ticket) {
 
 	if ((ticket.getOutTime() == null)) {
 	    throw new NullPointerException("Out time provided is incorrect null pointer exception");
@@ -18,59 +18,43 @@ public class FareCalculatorService {
 	}
     }
 
-    public void calculateFareForRegularClient(Ticket ticket) {
-
-	errorWhenVehiculeLeave(ticket);
-
-	calculateFare(ticket);
-
-	ticket.setPrice(0.95 * ticket.getPrice());
-
-    }
-
     public void calculateFare(Ticket ticket) {
 
-	errorWhenVehiculeLeave(ticket);
-
+	checkErrorsWhenVehiculeIsExitingParking(ticket);
 	LocalDateTime inHour = ticket.getInTime();
 	LocalDateTime outHour = ticket.getOutTime();
 	Duration durationOfTicket = Duration.between(inHour, outHour);
-
 	LocalDateTime afterHour = inHour.plusHours(1);// Hours thresholds after receipt of the ticket
-	LocalDateTime afterThreeQuartersOfHour = inHour.plusMinutes(45);
-
+	LocalDateTime afterThreeQuartersOfHour = inHour.plusMinutes(45); // Three-quarters of an hour threshold
 	// outHour <= afterHour && outHour > afterQuartersOfHour
-	Boolean testBetweenThreeQuartersAndHours = (outHour.isBefore(afterHour) || outHour.isEqual(afterHour))
+	boolean testBetweenThreeQuartersOfAnHourAndHours = (outHour.isBefore(afterHour) || outHour.isEqual(afterHour))
 		&& outHour.isAfter(afterThreeQuartersOfHour);
-
 	// outHour <= afterQuartersOfHour
-	Boolean testLessThreeQuarters = outHour.isBefore(afterThreeQuartersOfHour)
+	boolean testLessThreeQuartersOfAnHour = outHour.isBefore(afterThreeQuartersOfHour)
 		|| outHour.isEqual(afterThreeQuartersOfHour);
-
 	// outHour > afterHour
-	Boolean testMoreHour = outHour.isAfter(afterHour);
+	boolean testMoreHour = outHour.isAfter(afterHour);
 
 	switch (ticket.getParkingSpot().getParkingType()) {
 	case CAR: {
 
-	    if (testBetweenThreeQuartersAndHours) {
-		ticket.setPrice(1 * Fare.CAR_RATE_PER_HOUR);
+	    if (testBetweenThreeQuartersOfAnHourAndHours) {
+		ticket.setPrice(Fare.CAR_RATE_PER_HOUR);
 
-	    } else if (testLessThreeQuarters) {
+	    } else if (testLessThreeQuartersOfAnHour) {
 		ticket.setPrice(0.75 * Fare.CAR_RATE_PER_HOUR);
 
 	    } else if (testMoreHour) {
 		ticket.setPrice(durationOfTicket.toHours() * Fare.CAR_RATE_PER_HOUR);
 	    }
 	    break;
-
 	}
 	case BIKE: {
 
-	    if (testBetweenThreeQuartersAndHours) {
-		ticket.setPrice(1 * Fare.BIKE_RATE_PER_HOUR);
+	    if (testBetweenThreeQuartersOfAnHourAndHours) {
+		ticket.setPrice(Fare.BIKE_RATE_PER_HOUR);
 
-	    } else if (testLessThreeQuarters) {
+	    } else if (testLessThreeQuartersOfAnHour) {
 		ticket.setPrice(0.75 * Fare.BIKE_RATE_PER_HOUR);
 
 	    } else if (testMoreHour) {
@@ -81,5 +65,12 @@ public class FareCalculatorService {
 	default:
 	    throw new IllegalArgumentException("Unkown Parking Type");
 	}
+    }
+
+    public void calculateFareForRegularClient(Ticket ticket) {
+
+	checkErrorsWhenVehiculeIsExitingParking(ticket);
+	calculateFare(ticket);
+	ticket.setPrice(0.95 * ticket.getPrice());
     }
 }
