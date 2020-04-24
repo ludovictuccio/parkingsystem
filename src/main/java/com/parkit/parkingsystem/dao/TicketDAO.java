@@ -19,7 +19,6 @@ public class TicketDAO {
 
     private static final Logger logger = LogManager.getLogger("TicketDAO");
     private static final String ERROR_MESSAGE = "Error fetching next available slot";
-
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
     public boolean saveTicket(Ticket ticket) {
@@ -110,7 +109,7 @@ public class TicketDAO {
 	    if (rs.next()) {
 		numberTotalOfTickets = rs.getInt(1);
 	    }
-	} catch (SQLException | ClassNotFoundException ex) {
+	} catch (ClassNotFoundException | SQLException ex) {
 	    logger.error(ERROR_MESSAGE, ex);
 	} finally {
 	    dataBaseConfig.closeConnection(con);

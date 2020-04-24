@@ -50,5 +50,4 @@ public class InteractiveShell {
 	logger.info("2 Vehicle Exiting - Generate Ticket Price");
 	logger.info("3 Shutdown System");
     }
-
 }
