@@ -3,6 +3,7 @@ package com.parkit.parkingsystem.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import org.apache.logging.log4j.LogManager;
@@ -94,5 +95,28 @@ public class TicketDAO {
 	    dataBaseConfig.closePreparedStatement(ps);
 	}
 	return false;
+    }
+
+    public int getTotalNumberOfTicketsIssuedPerVehicle(String vehicleRegNumber) {
+	Connection con = null;
+	PreparedStatement ps = null;
+	ResultSet rs = null;
+	int numberTotalOfTickets = 0;
+	try {
+	    con = dataBaseConfig.getConnection();
+	    ps = con.prepareStatement(DBConstants.GET_NUMBER_TOTAL_OF_TICKETS);
+	    ps.setString(1, vehicleRegNumber);
+	    rs = ps.executeQuery();
+	    if (rs.next()) {
+		numberTotalOfTickets = rs.getInt(1);
+	    }
+	} catch (SQLException | ClassNotFoundException ex) {
+	    logger.error(ERROR_MESSAGE, ex);
+	} finally {
+	    dataBaseConfig.closeConnection(con);
+	    dataBaseConfig.closePreparedStatement(ps);
+	    dataBaseConfig.closeResultSet(rs);
+	}
+	return numberTotalOfTickets;
     }
 }

@@ -33,26 +33,27 @@ public class ParkingService {
 	    ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
 	    if (parkingSpot != null && parkingSpot.getId() > 0) {
 		String vehicleRegNumber = getVehicleRegNumber();
-
 		parkingSpot.setAvailable(false);
 		// allot this parking space and mark it's availability as false
 		parkingSpotDAO.updateParking(parkingSpot);
-
 		LocalDateTime inTime = LocalDateTime.now();
 		Ticket ticket = new Ticket();
 		// ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
-		// ticket.setId(ticketID);
+		// ticket.setId(0);
 		ticket.setParkingSpot(parkingSpot);
 		ticket.setVehicleRegNumber(vehicleRegNumber);
 		ticket.setPrice(0);
 		ticket.setInTime(inTime);
 		ticket.setOutTime(null);
 		ticketDAO.saveTicket(ticket);
+		if (ticketDAO.getTotalNumberOfTicketsIssuedPerVehicle(ticket.getVehicleRegNumber()) > 0) {
+		    logger.info("As regular client, you will benefit from a %d% discount on your final fare", 5);
+		}
 		logger.info("Generated Ticket and saved in DB");
 		logger.info("Please park your vehicle in spot number:" + parkingSpot.getId());
 		logger.info("Recorded in-time for vehicle number:" + vehicleRegNumber + " is:" + inTime);
 	    } else {
-		System.out.println("Sorry the parking is full. No more places are available.");
+		logger.info("Sorry the parking is full. No more places are available.");
 	    }
 	} catch (Exception e) {
 	    logger.error("Unable to process incoming vehicle", e);
@@ -108,13 +109,24 @@ public class ParkingService {
 	    Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
 	    LocalDateTime outTime = LocalDateTime.now();
 	    ticket.setOutTime(outTime);
-	    fareCalculatorService.calculateFare(ticket);
-	    if (ticketDAO.updateTicket(ticket)) {
+	    if (vehicleRegNumber.length() > 0) {
+		ticketDAO.updateTicket(ticket);
+		fareCalculatorService.calculateFareForRegularClient(ticket);
 		ParkingSpot parkingSpot = ticket.getParkingSpot();
 		parkingSpot.setAvailable(true);
 		parkingSpotDAO.updateParking(parkingSpot);
-		logger.info("Please pay the parking fare:" + ticket.getPrice());
-		logger.info("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
+		logger.info("As a regular client you  benefit from a 5% discount");
+		logger.info("Please pay the parking fare: " + ticket.getPrice());
+		logger.info("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:"
+			+ outTime.getMinute());
+	    } else if (ticketDAO.updateTicket(ticket)) {
+		fareCalculatorService.calculateFare(ticket);
+		ParkingSpot parkingSpot = ticket.getParkingSpot();
+		parkingSpot.setAvailable(true);
+		parkingSpotDAO.updateParking(parkingSpot);
+		logger.info("Please pay the parking fare: " + ticket.getPrice());
+		logger.info("Recorded out-time for vehicle number: " + ticket.getVehicleRegNumber() + " is:"
+			+ outTime.getMinute());
 	    } else {
 		logger.info("Unable to update ticket information. Error occurred");
 	    }
