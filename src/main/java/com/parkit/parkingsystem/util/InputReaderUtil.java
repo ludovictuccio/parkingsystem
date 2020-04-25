@@ -13,8 +13,7 @@ public class InputReaderUtil {
 
     public int readSelection() {
 	try {
-	    int input = Integer.parseInt(scan.nextLine());
-	    return input;
+	    return Integer.parseInt(scan.nextLine());
 	} catch (Exception e) {
 	    logger.error(ERROR_MESSAGE, e);
 	    logger.error("Error reading input. Please enter valid number for proceeding further");
@@ -22,7 +21,7 @@ public class InputReaderUtil {
 	}
     }
 
-    public String readVehicleRegistrationNumber() throws Exception {
+    public String readVehicleRegistrationNumber() {
 	try {
 	    String vehicleRegNumber = scan.nextLine();
 

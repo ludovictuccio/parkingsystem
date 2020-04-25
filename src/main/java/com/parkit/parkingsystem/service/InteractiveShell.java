@@ -9,6 +9,10 @@ import com.parkit.parkingsystem.util.InputReaderUtil;
 
 public class InteractiveShell {
 
+    private InteractiveShell() {
+
+    }
+
     private static final Logger logger = LogManager.getLogger("InteractiveShell");
 
     public static void loadInterface() {

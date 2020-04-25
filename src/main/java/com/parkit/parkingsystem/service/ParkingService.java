@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem.service;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -39,6 +40,7 @@ public class ParkingService {
 		// allot this parking space and mark it's availability as false
 		parkingSpotDAO.updateParking(parkingSpot);
 		LocalDateTime inTime = LocalDateTime.now();
+		String inTimeFormatter = inTime.format(formatter);
 		Ticket ticket = new Ticket();
 		// ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
 		// ticket.setId(0);
@@ -49,12 +51,11 @@ public class ParkingService {
 		ticket.setOutTime(null);
 		ticketDAO.saveTicket(ticket);
 		if (ticketDAO.getTotalNumberOfTicketsIssuedPerVehicle(ticket.getVehicleRegNumber()) > 0) {
-		    logger.info("As regular client, you will benefit from a %d% discount on your final fare", 5);
+		    logger.info("As regular client, you will benefit from a %d discount on your final fare", 5);
 		}
 		logger.info("Generated Ticket and saved in DB");
-		logger.info("Please park your vehicle in spot number: " + parkingSpot.getId());
-		logger.info("Recorded in-time for vehicle number: " + vehicleRegNumber + " is: "
-			+ inTime.format(formatter));
+		logger.info("Please park your vehicle in spot number: {}", parkingSpot.getId());
+		logger.info("Recorded in-time for vehicle number: {} is: {}", vehicleRegNumber, inTimeFormatter);
 	    } else {
 		logger.info("Sorry the parking is full. No more places are available.");
 	    }
@@ -63,7 +64,7 @@ public class ParkingService {
 	}
     }
 
-    private String getVehicleRegNumber() throws Exception {
+    private String getVehicleRegNumber() {
 	logger.info("Please type the vehicle registration number and press enter key");
 	return inputReaderUtil.readVehicleRegistrationNumber();
     }
@@ -77,7 +78,7 @@ public class ParkingService {
 	    if (parkingNumber > 0) {
 		parkingSpot = new ParkingSpot(parkingNumber, parkingType, true);
 	    } else {
-		throw new Exception("Error fetching parking number from DB. Parking slots might be full");
+		throw new SQLException("Error fetching parking number from DB. Parking slots might be full");
 	    }
 	} catch (IllegalArgumentException ie) {
 	    logger.error("Error parsing user input for type of vehicle", ie);
@@ -111,25 +112,28 @@ public class ParkingService {
 	    String vehicleRegNumber = getVehicleRegNumber();
 	    Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
 	    LocalDateTime outTime = LocalDateTime.now();
+	    String outTimeFormatter = outTime.format(formatter);
 	    ticket.setOutTime(outTime);
+
 	    if (vehicleRegNumber.length() > 0) {
 		ticketDAO.updateTicket(ticket);
 		fareCalculatorService.calculateFareForRegularClient(ticket);
 		ParkingSpot parkingSpot = ticket.getParkingSpot();
 		parkingSpot.setAvailable(true);
 		parkingSpotDAO.updateParking(parkingSpot);
-		logger.info("As a regular client you  benefit from a 5% discount");
-		logger.info("Please pay the parking fare: " + ticket.getPrice());
-		logger.info("Recorded out-time for vehicle number: " + ticket.getVehicleRegNumber() + " is:"
-			+ outTime.format(formatter));
+		logger.info("As regular client you  benefit from a %d discount", 5);
+		logger.info("Please pay the parking fare: {}", ticket.getPrice());
+		logger.info("Recorded out-time for vehicle number: {} is: {}", ticket.getVehicleRegNumber(),
+			outTimeFormatter);
+
 	    } else if (ticketDAO.updateTicket(ticket)) {
 		fareCalculatorService.calculateFare(ticket);
 		ParkingSpot parkingSpot = ticket.getParkingSpot();
 		parkingSpot.setAvailable(true);
 		parkingSpotDAO.updateParking(parkingSpot);
-		logger.info("Please pay the parking fare: " + ticket.getPrice());
-		logger.info("Recorded out-time for vehicle number: " + ticket.getVehicleRegNumber() + " is:"
-			+ outTime.format(formatter));
+		logger.info("Please pay the parking fare: {}", ticket.getPrice());
+		logger.info("Recorded out-time for vehicle number: {} is: {}", ticket.getVehicleRegNumber(),
+			outTimeFormatter);
 	    } else {
 		logger.info("Unable to update ticket information. Error occurred");
 	    }
