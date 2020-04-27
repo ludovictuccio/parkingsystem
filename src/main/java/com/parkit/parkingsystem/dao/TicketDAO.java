@@ -25,7 +25,7 @@ public class TicketDAO {
 	this.dataBaseConfig = dataBaseConfig;
     }
 
-    public boolean saveTicket(Ticket ticket) {
+    public boolean saveTicket(Ticket ticket) throws Exception {
 	Connection con = null;
 	PreparedStatement ps = null;
 	try {
@@ -39,7 +39,7 @@ public class TicketDAO {
 	    ps.setTimestamp(5, (ticket.getOutTime() == null) ? null : (Timestamp.valueOf(ticket.getOutTime())));
 	    return ps.execute();
 
-	} catch (Exception ex) {
+	} catch (SQLException ex) {
 	    logger.error(ERROR_MESSAGE, ex);
 	} finally {
 	    dataBaseConfig.closeConnection(con);
@@ -48,7 +48,7 @@ public class TicketDAO {
 	return false;
     }
 
-    public Ticket getTicket(String vehicleRegNumber) {
+    public Ticket getTicket(String vehicleRegNumber) throws Exception {
 	Connection con = null;
 	PreparedStatement ps = null;
 	ResultSet rs = null;
@@ -69,7 +69,7 @@ public class TicketDAO {
 		ticket.setInTime(rs.getTimestamp(4).toLocalDateTime());
 		ticket.setOutTime(rs.getTimestamp(5).toLocalDateTime());
 	    }
-	} catch (Exception ex) {
+	} catch (SQLException ex) {
 	    logger.error(ERROR_MESSAGE, ex);
 	} finally {
 	    dataBaseConfig.closeConnection(con);
