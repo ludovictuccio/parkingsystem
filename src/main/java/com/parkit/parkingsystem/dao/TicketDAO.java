@@ -3,6 +3,7 @@ package com.parkit.parkingsystem.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import org.apache.logging.log4j.LogManager;
@@ -18,8 +19,11 @@ public class TicketDAO {
 
     private static final Logger logger = LogManager.getLogger("TicketDAO");
     private static final String ERROR_MESSAGE = "Error fetching next available slot";
+    private DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
-    public DataBaseConfig dataBaseConfig = new DataBaseConfig();
+    public void setDataBaseConfig(DataBaseConfig dataBaseConfig) {
+	this.dataBaseConfig = dataBaseConfig;
+    }
 
     public boolean saveTicket(Ticket ticket) {
 	Connection con = null;
@@ -63,9 +67,8 @@ public class TicketDAO {
 		ticket.setVehicleRegNumber(vehicleRegNumber);
 		ticket.setPrice(rs.getDouble(3));
 		ticket.setInTime(rs.getTimestamp(4).toLocalDateTime());
-		ticket.setOutTime(rs.getTimestamp(5).toLocalDateTime());
-	    }
 
+	    }
 	} catch (Exception ex) {
 	    logger.error(ERROR_MESSAGE, ex);
 	} finally {
@@ -94,5 +97,28 @@ public class TicketDAO {
 	    dataBaseConfig.closePreparedStatement(ps);
 	}
 	return false;
+    }
+
+    public int getTotalNumberOfTicketsIssuedPerVehicle(String vehicleRegNumber) {
+	Connection con = null;
+	PreparedStatement ps = null;
+	ResultSet rs = null;
+	int numberTotalOfTickets = 0;
+	try {
+	    con = dataBaseConfig.getConnection();
+	    ps = con.prepareStatement(DBConstants.GET_NUMBER_TOTAL_OF_TICKETS);
+	    ps.setString(1, vehicleRegNumber);
+	    rs = ps.executeQuery();
+	    if (rs.next()) {
+		numberTotalOfTickets = rs.getInt(1);
+	    }
+	} catch (ClassNotFoundException | SQLException ex) {
+	    logger.error(ERROR_MESSAGE, ex);
+	} finally {
+	    dataBaseConfig.closeConnection(con);
+	    dataBaseConfig.closePreparedStatement(ps);
+	    dataBaseConfig.closeResultSet(rs);
+	}
+	return numberTotalOfTickets;
     }
 }
