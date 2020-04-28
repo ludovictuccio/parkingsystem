@@ -70,6 +70,22 @@ public class FareCalculatorServiceTest {
     }
 
     @Test
+    @DisplayName("CAR - 30 minutes parking time must be free ")
+    public void calculateFareCar_forMinusThanThirtyMinutes_returnsZero() {
+	ticket.setOutTime(ticket.getInTime().plusMinutes(29).plusSeconds(59));
+	fareCalculatorService.calculateFare(ticket);
+	assertThat(ticket.getPrice()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("CAR - (regular user) 30 minutes parking time must be free ")
+    public void calculateFareCarForRegularUser_forMinusThanThirtyMinutes_returnsZero() {
+	ticket.setOutTime(ticket.getInTime().plusMinutes(29).plusSeconds(59));
+	fareCalculatorService.calculateFareForRegularClient(ticket);
+	assertThat(ticket.getPrice()).isEqualTo(0);
+    }
+
+    @Test
     @DisplayName("CAR - 24 hours parking time should give 24 * parking fare per hour")
     public void calculateFareCar_forADayParkingTime_returnsTwentyFourTimesFare() {
 	ticket.setOutTime(ticket.getInTime().plusDays(1));
@@ -128,6 +144,24 @@ public class FareCalculatorServiceTest {
 	parkingSpot.setParkingType(ParkingType.BIKE);
 	fareCalculatorService.calculateFareForRegularClient(ticket);
 	assertThat(ticket.getPrice()).isEqualTo(0.75 * (0.95 * Fare.BIKE_RATE_PER_HOUR));
+    }
+
+    @Test
+    @DisplayName("BIKE - 30 minutes parking time must be free")
+    public void calculateFareBike_forMinusThanThirtyMinutes_returnsZero() {
+	ticket.setOutTime(ticket.getInTime().plusMinutes(29).plusSeconds(59));
+	parkingSpot.setParkingType(ParkingType.BIKE);
+	fareCalculatorService.calculateFare(ticket);
+	assertThat(ticket.getPrice()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("BIKE - (regular user)  30 minutes parking time must be free")
+    public void calculateFareBikeForRegularUser_forMinusThanThirtyMinutes_returnsZero() {
+	ticket.setOutTime(ticket.getInTime().plusMinutes(29).plusSeconds(59));
+	parkingSpot.setParkingType(ParkingType.BIKE);
+	fareCalculatorService.calculateFareForRegularClient(ticket);
+	assertThat(ticket.getPrice()).isEqualTo(0);
     }
 
     @Test
