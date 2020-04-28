@@ -49,7 +49,7 @@ public class ParkingService {
 		ticket.setOutTime(null);
 		ticketDAO.saveTicket(ticket);
 		if (ticketDAO.getTotalNumberOfTicketsIssuedPerVehicle(ticket.getVehicleRegNumber()) > 0) {
-		    logger.info("As regular user, you will benefit from a 5% discount on your final fare");
+		    logger.info("As regular user, you will benefit from a {}% discount on your final fare", 5);
 		}
 		logger.info("Generated Ticket and saved in DB");
 		logger.info("Please park your vehicle in spot number: {}", parkingSpot.getId());
@@ -117,7 +117,7 @@ public class ParkingService {
 
 	    if (totalNomberOfVehicleTickets > 0) {
 		fareCalculatorService.calculateFareForRegularClient(ticket);
-		logger.info("As regular user you benefit from a 5% discount");
+		logger.info("As regular user you benefit from a {}% discount", 5);
 	    } else {
 		fareCalculatorService.calculateFare(ticket);
 	    }

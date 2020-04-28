@@ -13,7 +13,7 @@ public class FareCalculatorService {
 	if ((ticket.getOutTime() == null)) {
 	    throw new NullPointerException("Out time provided is incorrect null pointer exception");
 	}
-	if (ticket.getOutTime().compareTo(ticket.getInTime()) < 0) {
+	if (ticket.getOutTime().compareTo(ticket.getInTime()) <= 0) {
 	    throw new NullPointerException("Out time provided is incorrect:" + ticket.getOutTime().toString());
 	}
     }
@@ -34,21 +34,6 @@ public class FareCalculatorService {
 		|| outHour.isEqual(afterThreeQuartersOfHour);
 	// outHour > afterHour
 	boolean testMoreHour = outHour.isAfter(afterHour);
-
-//	do {
-//	if (testBetweenThreeQuartersOfAnHourAndHours) {
-//	    ticket.setPrice(Fare.CAR_RATE_PER_HOUR);
-//	    ticket.setPrice(Fare.BIKE_RATE_PER_HOUR);
-//	} else if (testLessThreeQuartersOfAnHour) {
-//	    ticket.setPrice(0.75 * Fare.CAR_RATE_PER_HOUR);
-//	    ticket.setPrice(0.75 * Fare.BIKE_RATE_PER_HOUR);
-//
-//	} else if (testMoreHour) {
-//	    ticket.setPrice(durationOfTicket.toHours() * Fare.CAR_RATE_PER_HOUR);
-//	    ticket.setPrice(durationOfTicket.toHours() * Fare.BIKE_RATE_PER_HOUR);
-//	}
-//
-//	}while(ticket.getParkingSpot().getParkingType() : CAR);
 
 	switch (ticket.getParkingSpot().getParkingType()) {
 	case CAR: {
