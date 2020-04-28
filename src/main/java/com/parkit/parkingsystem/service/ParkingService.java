@@ -118,6 +118,8 @@ public class ParkingService {
 	    if (totalNomberOfVehicleTickets > 0) {
 		fareCalculatorService.calculateFareForRegularClient(ticket);
 		logger.info("As regular user you benefit from a {}% discount", 5);
+	    } else if (ticket.getOutTime().isBefore(ticket.getInTime().plusMinutes(30))) {
+		fareCalculatorService.calculateFreeFareForLessThanThirtyMinutes(ticket);
 	    } else {
 		fareCalculatorService.calculateFare(ticket);
 	    }
