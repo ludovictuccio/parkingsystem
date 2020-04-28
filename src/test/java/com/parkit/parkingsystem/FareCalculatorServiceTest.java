@@ -73,7 +73,7 @@ public class FareCalculatorServiceTest {
     @DisplayName("CAR - 30 minutes parking time must be free ")
     public void calculateFareCar_forMinusThanThirtyMinutes_returnsZero() {
 	ticket.setOutTime(ticket.getInTime().plusMinutes(29).plusSeconds(59));
-	fareCalculatorService.calculateFare(ticket);
+	fareCalculatorService.calculateFreeFareForLessThanThirtyMinutes(ticket);
 	assertThat(ticket.getPrice()).isEqualTo(0);
     }
 
@@ -81,7 +81,7 @@ public class FareCalculatorServiceTest {
     @DisplayName("CAR - (regular user) 30 minutes parking time must be free ")
     public void calculateFareCarForRegularUser_forMinusThanThirtyMinutes_returnsZero() {
 	ticket.setOutTime(ticket.getInTime().plusMinutes(29).plusSeconds(59));
-	fareCalculatorService.calculateFareForRegularClient(ticket);
+	fareCalculatorService.calculateFreeFareForLessThanThirtyMinutes(ticket);
 	assertThat(ticket.getPrice()).isEqualTo(0);
     }
 
@@ -151,7 +151,7 @@ public class FareCalculatorServiceTest {
     public void calculateFareBike_forMinusThanThirtyMinutes_returnsZero() {
 	ticket.setOutTime(ticket.getInTime().plusMinutes(29).plusSeconds(59));
 	parkingSpot.setParkingType(ParkingType.BIKE);
-	fareCalculatorService.calculateFare(ticket);
+	fareCalculatorService.calculateFreeFareForLessThanThirtyMinutes(ticket);
 	assertThat(ticket.getPrice()).isEqualTo(0);
     }
 
@@ -160,7 +160,7 @@ public class FareCalculatorServiceTest {
     public void calculateFareBikeForRegularUser_forMinusThanThirtyMinutes_returnsZero() {
 	ticket.setOutTime(ticket.getInTime().plusMinutes(29).plusSeconds(59));
 	parkingSpot.setParkingType(ParkingType.BIKE);
-	fareCalculatorService.calculateFareForRegularClient(ticket);
+	fareCalculatorService.calculateFreeFareForLessThanThirtyMinutes(ticket);
 	assertThat(ticket.getPrice()).isEqualTo(0);
     }
 
