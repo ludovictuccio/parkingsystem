@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
 public class DataBaseConfig {
 
     private static final Logger logger = LogManager.getLogger("DataBaseConfig");
-    private static final String sql_credentials_file = "src/main/resources/SQL_credentials_security.properties";
+    private static final String SQL_CREDENTIALS_SECURITY = "src/main/resources/SQL_credentials_security.properties";
     private String url;
     private String userName;
     private String password;
@@ -25,16 +25,16 @@ public class DataBaseConfig {
     public Connection getConnection() throws ClassNotFoundException, SQLException {
 	logger.debug("Create DB connection");
 	Class.forName("com.mysql.cj.jdbc.Driver");
-	try (InputStream inputStream = new FileInputStream(sql_credentials_file)) {
+	try (InputStream inputStream = new FileInputStream(SQL_CREDENTIALS_SECURITY)) {
 	    Properties properties = new Properties();
 	    properties.load(inputStream);
 	    url = properties.getProperty("url");
 	    userName = properties.getProperty("userName");
 	    password = properties.getProperty("password");
-	} catch (FileNotFoundException ex_fnf) {
-	    logger.error("File not found. Please verify sql_credentials_file access root.", ex_fnf);
-	} catch (IOException ex_io) {
-	    logger.error("Error during SQL connection. Please check the contents of the file.", ex_io);
+	} catch (FileNotFoundException fnf) {
+	    logger.error("File not found. Please verify sql_credentials_file access root.", fnf);
+	} catch (IOException ioex) {
+	    logger.error("Error during SQL connection. Please check the contents of the file.", ioex);
 	}
 	return DriverManager.getConnection(url, userName, password);
     }
