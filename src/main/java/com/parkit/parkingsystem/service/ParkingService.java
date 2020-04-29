@@ -115,7 +115,8 @@ public class ParkingService {
 	    int totalNomberOfVehicleTickets = ticketDAO
 		    .getTotalNumberOfTicketsIssuedPerVehicle(ticket.getVehicleRegNumber());
 
-	    if (totalNomberOfVehicleTickets > 0 && ticket.getOutTime().isAfter(ticket.getInTime().plusMinutes(30))) {
+	    if (totalNomberOfVehicleTickets > 0
+		    && ticket.getOutTime().isAfter(ticket.getInTime().plusMinutes(29).plusSeconds(59))) {
 		fareCalculatorService.calculateFareForRegularClient(ticket);
 		logger.info("As regular user you benefit from a {}% discount", 5);
 	    } else if (ticket.getOutTime().isBefore(ticket.getInTime().plusMinutes(30))) {
