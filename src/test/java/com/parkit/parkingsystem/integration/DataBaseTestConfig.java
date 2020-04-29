@@ -1,4 +1,4 @@
-package com.parkit.parkingsystem.integration.config;
+package com.parkit.parkingsystem.integration;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
