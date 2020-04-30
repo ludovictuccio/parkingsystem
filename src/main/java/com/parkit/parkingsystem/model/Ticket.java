@@ -36,7 +36,7 @@ public class Ticket {
     }
 
     public double getPrice() {
-	return price;
+	return Math.round(price * 100.0) / 100.0;
     }
 
     public void setPrice(double price) {
