@@ -1,6 +1,7 @@
 package com.parkit.parkingsystem.service;
 
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -135,8 +136,9 @@ public class ParkingService {
 		ParkingSpot parkingSpot = ticket.getParkingSpot();
 		parkingSpot.setAvailable(true);
 		parkingSpotDAO.updateParking(parkingSpot);
-		logger.info("Please pay the parking fare: {}", ticket.getPrice());
-		logger.info("Recorded out-time for vehicle number: {} is {} ", ticket.getVehicleRegNumber(),
+		DecimalFormat arroundPrice = new DecimalFormat("#0.00€");
+		logger.info("Please pay the parking fare: {}", arroundPrice.format(ticket.getPrice()));
+		logger.info("Recorded out-time for vehicle number:{} is:{}", ticket.getVehicleRegNumber(),
 			outTimeFormatter);
 	    } else {
 		logger.error("Unable to update ticket information. Error occurred");
