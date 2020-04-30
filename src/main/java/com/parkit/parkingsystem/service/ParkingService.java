@@ -34,6 +34,14 @@ public class ParkingService {
 	    ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
 	    if (parkingSpot != null && parkingSpot.getId() > 0) {
 		String vehicleRegNumber = getVehicleRegNumber();
+
+		// Verify if a vehicle is already parked
+		while (ticketDAO.checkIfVehicleIsAlreadyParked(vehicleRegNumber) == 1) {
+		    logger.error(
+			    "INVALID ENTRY. This registration is already occupied at a parking space. Please enter a valid registration.");
+		    vehicleRegNumber = getVehicleRegNumber();
+		}
+
 		parkingSpot.setAvailable(false);
 		parkingSpotDAO.updateParking(parkingSpot);
 		LocalDateTime inTime = LocalDateTime.now();
@@ -45,6 +53,7 @@ public class ParkingService {
 		ticket.setInTime(inTime);
 		ticket.setOutTime(null);
 		ticketDAO.saveTicket(ticket);
+
 		if (ticketDAO.getTotalNumberOfTicketsIssuedPerVehicle(ticket.getVehicleRegNumber()) > 0) {
 		    logger.info("As regular user, you will benefit from a {}% discount on your final fare", 5);
 		}

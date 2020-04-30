@@ -31,7 +31,6 @@ public class TicketDAO {
 	try {
 	    con = dataBaseConfig.getConnection();
 	    ps = con.prepareStatement(DBConstants.SAVE_TICKET);
-	    // ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
 	    ps.setInt(1, ticket.getParkingSpot().getId());
 	    ps.setString(2, ticket.getVehicleRegNumber());
 	    ps.setDouble(3, ticket.getPrice());
@@ -56,7 +55,6 @@ public class TicketDAO {
 	try {
 	    con = dataBaseConfig.getConnection();
 	    ps = con.prepareStatement(DBConstants.GET_TICKET);
-	    // ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
 	    ps.setString(1, vehicleRegNumber);
 	    rs = ps.executeQuery();
 	    if (rs.next()) {
@@ -67,7 +65,6 @@ public class TicketDAO {
 		ticket.setVehicleRegNumber(vehicleRegNumber);
 		ticket.setPrice(rs.getDouble(3));
 		ticket.setInTime(rs.getTimestamp(4).toLocalDateTime());
-
 	    }
 	} catch (Exception ex) {
 	    logger.error(ERROR_MESSAGE, ex);
@@ -120,5 +117,29 @@ public class TicketDAO {
 	    dataBaseConfig.closeResultSet(rs);
 	}
 	return numberTotalOfTickets;
+    }
+
+    // Verify if a vehicle with the same registration number is already parked
+    public int checkIfVehicleIsAlreadyParked(String vehicleRegNumber) {
+	Connection con = null;
+	PreparedStatement ps = null;
+	ResultSet rs = null;
+	int parkedVehicle = 0;
+	try {
+	    con = dataBaseConfig.getConnection();
+	    ps = con.prepareStatement(DBConstants.CHECK_PARKED_VEHICLES);
+	    ps.setString(1, vehicleRegNumber);
+	    rs = ps.executeQuery();
+	    if (rs.next()) {
+		parkedVehicle = rs.getInt(1);
+	    }
+	} catch (ClassNotFoundException | SQLException ex) {
+	    logger.error(ERROR_MESSAGE, ex);
+	} finally {
+	    dataBaseConfig.closeConnection(con);
+	    dataBaseConfig.closePreparedStatement(ps);
+	    dataBaseConfig.closeResultSet(rs);
+	}
+	return parkedVehicle;
     }
 }
