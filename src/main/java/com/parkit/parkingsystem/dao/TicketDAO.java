@@ -3,7 +3,6 @@ package com.parkit.parkingsystem.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import org.apache.logging.log4j.LogManager;
@@ -37,7 +36,6 @@ public class TicketDAO {
 	    ps.setTimestamp(4, Timestamp.valueOf(ticket.getInTime()));
 	    ps.setTimestamp(5, (ticket.getOutTime() == null) ? null : (Timestamp.valueOf(ticket.getOutTime())));
 	    return ps.execute();
-
 	} catch (Exception ex) {
 	    logger.error(ERROR_MESSAGE, ex);
 	} finally {
@@ -65,6 +63,9 @@ public class TicketDAO {
 		ticket.setVehicleRegNumber(vehicleRegNumber);
 		ticket.setPrice(rs.getDouble(3));
 		ticket.setInTime(rs.getTimestamp(4).toLocalDateTime());
+		if (rs.getTimestamp(5) != null) {
+		    ticket.setOutTime(rs.getTimestamp(5).toLocalDateTime());
+		}
 	    }
 	} catch (Exception ex) {
 	    logger.error(ERROR_MESSAGE, ex);
@@ -86,60 +87,13 @@ public class TicketDAO {
 	    ps.setTimestamp(2, Timestamp.valueOf(ticket.getOutTime()));
 	    ps.setInt(3, ticket.getId());
 	    ps.execute();
-	    return true;
 	} catch (Exception ex) {
 	    logger.error("Error saving ticket info", ex);
+	    return false;
 	} finally {
 	    dataBaseConfig.closeConnection(con);
 	    dataBaseConfig.closePreparedStatement(ps);
 	}
-	return false;
-    }
-
-    public int getTotalNumberOfTicketsIssuedPerVehicle(String vehicleRegNumber) {
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
-	int numberTotalOfTickets = 0;
-	try {
-	    con = dataBaseConfig.getConnection();
-	    ps = con.prepareStatement(DBConstants.GET_NUMBER_TOTAL_OF_TICKETS);
-	    ps.setString(1, vehicleRegNumber);
-	    rs = ps.executeQuery();
-	    if (rs.next()) {
-		numberTotalOfTickets = rs.getInt(1);
-	    }
-	} catch (ClassNotFoundException | SQLException ex) {
-	    logger.error(ERROR_MESSAGE, ex);
-	} finally {
-	    dataBaseConfig.closeConnection(con);
-	    dataBaseConfig.closePreparedStatement(ps);
-	    dataBaseConfig.closeResultSet(rs);
-	}
-	return numberTotalOfTickets;
-    }
-
-    // Verify if a vehicle with the same registration number is already parked
-    public int checkIfVehicleIsAlreadyParked(String vehicleRegNumber) {
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
-	int parkedVehicle = 0;
-	try {
-	    con = dataBaseConfig.getConnection();
-	    ps = con.prepareStatement(DBConstants.CHECK_PARKED_VEHICLES);
-	    ps.setString(1, vehicleRegNumber);
-	    rs = ps.executeQuery();
-	    if (rs.next()) {
-		parkedVehicle = rs.getInt(1);
-	    }
-	} catch (ClassNotFoundException | SQLException ex) {
-	    logger.error(ERROR_MESSAGE, ex);
-	} finally {
-	    dataBaseConfig.closeConnection(con);
-	    dataBaseConfig.closePreparedStatement(ps);
-	    dataBaseConfig.closeResultSet(rs);
-	}
-	return parkedVehicle;
+	return true;
     }
 }
