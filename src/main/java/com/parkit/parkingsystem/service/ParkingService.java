@@ -36,14 +36,15 @@ public class ParkingService {
 	    if (parkingSpot != null && parkingSpot.getId() > 0) {
 		String vehicleRegNumber = getVehicleRegNumber();
 
-		// Check if a vehicle doesn't get an out-ticket to see if a vehicle is already
-		// parked
-		Ticket getTicketDAO = ticketDAO.getTicket(vehicleRegNumber);
-		while (getTicketDAO != null && getTicketDAO.getOutTime() == null) {
+		// Check if a vehicle already has an entry ticket and check if his out-ticket is
+		// null to know if he is already parked
+		Ticket parkedVehicle = ticketDAO.getTicket(vehicleRegNumber);
+		// While a vehicle has already parked and didn't get out-ticket
+		while (parkedVehicle != null && parkedVehicle.getOutTime() == null) {
 		    logger.error(
 			    "INVALID ENTRY. This registration is already occupied at a parking space. Please enter a valid registration.");
 		    vehicleRegNumber = getVehicleRegNumber();
-		    getTicketDAO = ticketDAO.getTicket(vehicleRegNumber);
+		    parkedVehicle = ticketDAO.getTicket(vehicleRegNumber);
 		}
 
 		parkingSpot.setAvailable(false);
@@ -59,7 +60,7 @@ public class ParkingService {
 		ticketDAO.saveTicket(ticket);
 
 		// Check if a vehicle has already get a ticket
-		if (getTicketDAO != null && getTicketDAO.getOutTime() != null) {
+		if (parkedVehicle != null && parkedVehicle.getOutTime() != null) {
 		    logger.info("As regular user, you will benefit from a {}% discount on your final fare", 5);
 		}
 		logger.info("Generated Ticket and saved in DB");
@@ -120,20 +121,33 @@ public class ParkingService {
 	try {
 	    String vehicleRegNumber = getVehicleRegNumber();
 	    Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
+
+	    if (ticket != null) {
+		Ticket exitedVehicle = ticket;
+		// For to not recover an out-ticket
+		while (exitedVehicle != null && exitedVehicle.getOutTime() != null) {
+		    logger.error(
+			    "INVALID ENTRY. This registration has already exited the parking. Please enter a valid registration.");
+		    vehicleRegNumber = getVehicleRegNumber();
+		    exitedVehicle = ticketDAO.getTicket(vehicleRegNumber);
+		}
+	    }
 	    LocalDateTime outTime = LocalDateTime.now();
 	    String outTimeFormatter = outTime.format(formatter);
 	    ticket.setOutTime(outTime);
 
-	    if (ticket != null && ticket.getOutTime().isAfter(ticket.getInTime().plusMinutes(29).plusSeconds(59))) {
+	    if (ticket.getOutTime().isBefore(ticket.getInTime().plusMinutes(30))) {
+		fareCalculatorService.calculateFreeFareForLessThanThirtyMinutes(ticket);
+
+	    } else if (ticket != null
+		    && ticket.getOutTime().isAfter(ticket.getInTime().plusMinutes(29).plusSeconds(59))) {
 		fareCalculatorService.calculateFareForRegularClient(ticket);
 		logger.info("As regular user you benefit from a {}% discount", 5);
-
-	    } else if (ticket.getOutTime().isBefore(ticket.getInTime().plusMinutes(30))) {
-		fareCalculatorService.calculateFreeFareForLessThanThirtyMinutes(ticket);
 
 	    } else {
 		fareCalculatorService.calculateFare(ticket);
 	    }
+
 	    if (ticketDAO.updateTicket(ticket)) {
 		ParkingSpot parkingSpot = ticket.getParkingSpot();
 		parkingSpot.setAvailable(true);
@@ -146,7 +160,7 @@ public class ParkingService {
 		logger.error("Unable to update ticket information. Error occurred");
 	    }
 	} catch (Exception e) {
-	    logger.error("Unable to process exiting vehicle", e);
+	    logger.error("Unable to process exiting vehicle");
 	}
     }
 }
