@@ -37,16 +37,15 @@ public class ParkingService {
 		String vehicleRegNumber = getVehicleRegNumber();
 
 		// Check if a vehicle already has an entry ticket and check if his out-ticket is
-		// null to know if he is already parked
+		// null to know if he's already parked
 		Ticket parkedVehicle = ticketDAO.getTicket(vehicleRegNumber);
 		// While a vehicle has already parked and didn't get out-ticket
 		while (parkedVehicle != null && parkedVehicle.getOutTime() == null) {
 		    logger.error(
-			    "INVALID ENTRY. This registration is already occupied at a parking space. Please enter a valid registration.");
+			    "INVALID ENTRY \r\nThis registration is already occupied at a parking space. \r\nEnter a valid registration (or other character to exit and return to menu).");
 		    vehicleRegNumber = getVehicleRegNumber();
 		    parkedVehicle = ticketDAO.getTicket(vehicleRegNumber);
 		}
-
 		parkingSpot.setAvailable(false);
 		parkingSpotDAO.updateParking(parkingSpot);
 		LocalDateTime inTime = LocalDateTime.now();
@@ -123,23 +122,25 @@ public class ParkingService {
 	    Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
 
 	    if (ticket != null) {
-		Ticket exitedVehicle = ticket;
 		// For to not recover an out-ticket
-		while (exitedVehicle != null && exitedVehicle.getOutTime() != null) {
+		while (ticket != null && ticket.getOutTime() != null) {
 		    logger.error(
-			    "INVALID ENTRY. This registration has already exited the parking. Please enter a valid registration.");
+			    "INVALID ENTRY \r\nThis registration has already exited the parking.\r\nEnter a valid registration (or other character to exit and return to menu).");
 		    vehicleRegNumber = getVehicleRegNumber();
-		    exitedVehicle = ticketDAO.getTicket(vehicleRegNumber);
+		    ticket = ticketDAO.getTicket(vehicleRegNumber);
 		}
 	    }
 	    LocalDateTime outTime = LocalDateTime.now();
 	    String outTimeFormatter = outTime.format(formatter);
+	    LocalDateTime inTime = ticket.getInTime();
+	    String inTimeFormatter = inTime.format(formatter);
 	    ticket.setOutTime(outTime);
+	    int numberVisitsUser = ticketDAO.checkNumberVisitsUser(ticket.getVehicleRegNumber());
 
 	    if (ticket.getOutTime().isBefore(ticket.getInTime().plusMinutes(30))) {
 		fareCalculatorService.calculateFreeFareForLessThanThirtyMinutes(ticket);
 
-	    } else if (ticket != null
+	    } else if (numberVisitsUser > 0
 		    && ticket.getOutTime().isAfter(ticket.getInTime().plusMinutes(29).plusSeconds(59))) {
 		fareCalculatorService.calculateFareForRegularClient(ticket);
 		logger.info("As regular user you benefit from a {}% discount", 5);
@@ -152,6 +153,7 @@ public class ParkingService {
 		ParkingSpot parkingSpot = ticket.getParkingSpot();
 		parkingSpot.setAvailable(true);
 		parkingSpotDAO.updateParking(parkingSpot);
+		logger.info("Recorded in-time : {}", inTimeFormatter);
 		DecimalFormat arroundPrice = new DecimalFormat("#0.00 €");
 		logger.info("Please pay the parking fare: {}", arroundPrice.format(ticket.getPrice()));
 		logger.info("Recorded out-time for vehicle number: {} is: {}", ticket.getVehicleRegNumber(),
