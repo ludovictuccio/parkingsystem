@@ -7,7 +7,7 @@ import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.model.Ticket;
 
 /**
- * This class calculates the price of tickets
+ * This class calculates the tickets price during exiting process
  * 
  * @author Ludovic Tuccio
  */
@@ -15,6 +15,8 @@ public class FareCalculatorService {
 
     /**
      * This method check errors during the exit parking process
+     * 
+     * @param ticket check NullPointerException
      */
     public void checkErrorsWhenVehiculeIsExitingParking(Ticket ticket) {
 
@@ -28,6 +30,8 @@ public class FareCalculatorService {
 
     /**
      * This method calculate ticket fare
+     * 
+     * @param ticket fare
      */
     public void calculateFare(Ticket ticket) {
 
@@ -82,13 +86,15 @@ public class FareCalculatorService {
 
 	} else {
 	    throw new IllegalArgumentException(
-		    "An error was occured. Please try again in a few moments or contact our technical support");
+		    "An error was occured. Please try again in a few moments or contact our technical support.");
 	}
     }
 
     /**
      * This method set at 0 the parking ticket fare for a period less than 30
      * minutes
+     * 
+     * @param ticket free fare for short period
      */
     public void calculateFreeFareForLessThanThirtyMinutes(Ticket ticket) {
 	checkErrorsWhenVehiculeIsExitingParking(ticket);
@@ -97,8 +103,10 @@ public class FareCalculatorService {
     }
 
     /**
-     * This method set the ticket price with a 5% discount for users who have
-     * already come to the parking
+     * This method set the ticket price with a 5% discount for regular users with a
+     * predefined visit threshold
+     * 
+     * @param ticket fare for regular user
      */
     public void calculateFareForRegularClient(Ticket ticket) {
 	checkErrorsWhenVehiculeIsExitingParking(ticket);

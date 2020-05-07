@@ -15,16 +15,41 @@ import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 
+/**
+ * This class contains methods used to interact with database ticket table.
+ * 
+ * @author Ludovic Tuccio
+ */
 public class TicketDAO {
-
+    /**
+     * TicketDAO logger.
+     */
     private static final Logger logger = LogManager.getLogger("TicketDAO");
-    private static final String ERROR_MESSAGE = "Error fetching next available slot";
+    /**
+     * DataBaseConfig object creation.
+     */
     private DataBaseConfig dataBaseConfig = new DataBaseConfig();
+    /**
+     * Error message to display in some error loggers.
+     */
+    private static final String ERROR_MESSAGE = "Error fetching next available slot";
 
+    /**
+     * Setter of the DataBaseConfig
+     * 
+     * @param dataBaseConfig
+     */
     public void setDataBaseConfig(DataBaseConfig dataBaseConfig) {
 	this.dataBaseConfig = dataBaseConfig;
     }
 
+    /**
+     * Used to save tickets to database.
+     *
+     * @param ticket the Ticket to save
+     * @return true if ticket was saved successfully or false if saving process
+     *         failed
+     */
     public boolean saveTicket(Ticket ticket) {
 	Connection con = null;
 	PreparedStatement ps = null;
@@ -46,6 +71,12 @@ public class TicketDAO {
 	return false;
     }
 
+    /**
+     * Used to recover a database ticket.
+     * 
+     * @param vehicleRegNumber a user's vehicle registration number
+     * @return the latest ticket found in database
+     */
     public Ticket getTicket(String vehicleRegNumber) {
 	Connection con = null;
 	PreparedStatement ps = null;
@@ -76,6 +107,14 @@ public class TicketDAO {
 	return ticket;
     }
 
+    /**
+     * Used to update the latest ticket for a vehicleRegNumber, updating ticket
+     * price and out-time.
+     *
+     * @param ticket the Ticket to update
+     * @return true if the ticket was updated successfully or false if the updating
+     *         process failed
+     */
     public boolean updateTicket(Ticket ticket) {
 	Connection con = null;
 	PreparedStatement ps = null;
@@ -96,6 +135,14 @@ public class TicketDAO {
 	return true;
     }
 
+    /**
+     * Used to check the number of tickets already issued and paid for the same
+     * vehicle registration number, this in order to determine its number of visits.
+     *
+     * @param vehicleRegNumber the user's vehicle registration number
+     * @return int numberVisitsUser with the total number of the vehicle visits, or
+     *         0 if it's his first visit
+     */
     public int checkNumberVisitsUser(String vehicleRegNumber) {
 	Connection con = null;
 	PreparedStatement ps = null;
@@ -110,7 +157,7 @@ public class TicketDAO {
 		numberVisitsUser = rs.getInt(1);
 	    }
 	} catch (ClassNotFoundException | SQLException ex) {
-	    logger.error(ERROR_MESSAGE, ex);
+	    logger.error("Error during check existing old tickets process.", ex);
 	} finally {
 	    dataBaseConfig.closeConnection(con);
 	    dataBaseConfig.closeResultSet(rs);

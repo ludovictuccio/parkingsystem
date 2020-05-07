@@ -15,22 +15,57 @@ import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 
+/**
+ * This class is used to manage parking entry and exit process.
+ * 
+ * @author Ludovic Tuccio
+ */
 public class ParkingService {
-
-    private static final Logger logger = LogManager.getLogger("ParkingService");
+    /**
+     * Create a FareCalculatorService object.
+     */
     private static FareCalculatorService fareCalculatorService = new FareCalculatorService();
+    /**
+     * InputReaderUtil object.
+     */
     private InputReaderUtil inputReaderUtil;
+    /**
+     * ParkingSpotDAO object.
+     */
     private ParkingSpotDAO parkingSpotDAO;
+    /**
+     * TicketDAO object.
+     */
     private TicketDAO ticketDAO;
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-    private static final Integer VISITS_THRESHOLD_REGULAR_USER = 1; // Visits threshold to be a regular user
+    /**
+     * ParkingService logger.
+     */
+    private static final Logger logger = LogManager.getLogger("ParkingService");
+    /**
+     * Formats the time for a careful display
+     */
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+    /**
+     * Defines visits threshold to be a regular user
+     */
+    private static final int VISITS_THRESHOLD_REGULAR_USER = 1;
 
+    /**
+     * Class constructor.
+     * 
+     * @param inputReaderUtil
+     * @param parkingSpotDAO
+     * @param ticketDAO
+     */
     public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO) {
 	this.inputReaderUtil = inputReaderUtil;
 	this.parkingSpotDAO = parkingSpotDAO;
 	this.ticketDAO = ticketDAO;
     }
 
+    /**
+     * This method manages incoming vehicle.
+     */
     public void processIncomingVehicle() {
 	try {
 	    ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
@@ -77,11 +112,23 @@ public class ParkingService {
 	}
     }
 
+    /**
+     * This method calls readVehicleRegistrationNumber method from
+     * InputReaderUtil.class, in order that the user enters his valid vehicle
+     * registration number
+     * 
+     * @return String, the vehicle registration number
+     */
     private String getVehicleRegNumber() {
 	logger.info("Please type the vehicle registration number and press enter key");
 	return inputReaderUtil.readVehicleRegistrationNumber();
     }
 
+    /**
+     * This method check if there is any available parking spot for incoming users.
+     * 
+     * @return parkingSpot, the available parking spot
+     */
     public ParkingSpot getNextParkingNumberIfAvailable() {
 	int parkingNumber = 0;
 	ParkingSpot parkingSpot = null;
@@ -101,6 +148,13 @@ public class ParkingService {
 	return parkingSpot;
     }
 
+    /**
+     * This method asks the user what type of vehicle he wants to park (car or bike)
+     * during incoming process.
+     * 
+     * @return enumeration ParkingType, the selected vehicle type
+     * 
+     */
     private ParkingType getVehicleType() {
 	logger.info("Please select vehicle type from menu");
 	logger.info("1 CAR");
@@ -120,6 +174,9 @@ public class ParkingService {
 	}
     }
 
+    /**
+     * This method manages exiting vehicle.
+     */
     public void processExitingVehicle() {
 	try {
 	    String vehicleRegNumber = getVehicleRegNumber();
@@ -144,8 +201,7 @@ public class ParkingService {
 	    if (ticket.getOutTime().isBefore(ticket.getInTime().plusMinutes(30))) {
 		fareCalculatorService.calculateFreeFareForLessThanThirtyMinutes(ticket);
 
-	    } else if (numberVisitsUser >= VISITS_THRESHOLD_REGULAR_USER
-		    && ticket.getOutTime().isAfter(ticket.getInTime().plusMinutes(29).plusSeconds(59))) {
+	    } else if (numberVisitsUser >= VISITS_THRESHOLD_REGULAR_USER) {
 		fareCalculatorService.calculateFareForRegularClient(ticket);
 		logger.info("As regular user you benefit from a {}% discount", 5);
 

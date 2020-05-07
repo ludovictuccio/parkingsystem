@@ -14,14 +14,42 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * This class establishes connection to database and closes them.
+ * 
+ * @author Ludovic Tuccio
+ */
 public class DataBaseConfig {
 
+    /**
+     * DataBaseConfig logger.
+     */
     private static final Logger logger = LogManager.getLogger("DataBaseConfig");
+    /**
+     * Properties file containing the information necessary for the connection to
+     * MySQL database.
+     */
     private static final String SQL_CREDENTIALS_SECURITY = "src/main/resources/SQL_credentials_security.properties";
+    /**
+     * URL used to connect application to MySQL database.
+     */
     private String url;
+    /**
+     * User name that will be used for connecting to MySQL database.
+     */
     private String userName;
+    /**
+     * Password that will be used for connecting to MySQL database.
+     */
     private String password;
 
+    /**
+     * Create a MySQL database connection.
+     * 
+     * @return a Connection instance
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     */
     public Connection getConnection() throws ClassNotFoundException, SQLException {
 	logger.debug("Create DB connection");
 	Class.forName("com.mysql.cj.jdbc.Driver");
@@ -39,6 +67,11 @@ public class DataBaseConfig {
 	return DriverManager.getConnection(url, userName, password);
     }
 
+    /**
+     * Close established Connection.
+     *
+     * @param con the Connection to close
+     */
     public void closeConnection(Connection con) {
 	if (con != null) {
 	    try {
@@ -50,6 +83,11 @@ public class DataBaseConfig {
 	}
     }
 
+    /**
+     * Close established PreparedStatement.
+     *
+     * @param ps the PreparedStatement to close
+     */
     public void closePreparedStatement(PreparedStatement ps) {
 	if (ps != null) {
 	    try {
@@ -61,6 +99,11 @@ public class DataBaseConfig {
 	}
     }
 
+    /**
+     * Close established ResultSet.
+     *
+     * @param rs the ResultSet to close
+     */
     public void closeResultSet(ResultSet rs) {
 	if (rs != null) {
 	    try {
