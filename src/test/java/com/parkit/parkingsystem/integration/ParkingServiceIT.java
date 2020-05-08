@@ -21,7 +21,6 @@ import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
-import com.parkit.parkingsystem.service.FareCalculatorService;
 import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 
@@ -34,8 +33,6 @@ public class ParkingServiceIT {
     private LocalDateTime inTime;
 
     @Mock
-    private FareCalculatorService fareCalculatorService;
-    @Mock
     private static InputReaderUtil inputReaderUtil;
     @Mock
     private static ParkingSpotDAO parkingSpotDAO;
@@ -44,7 +41,7 @@ public class ParkingServiceIT {
 
     @BeforeEach
     private void setUpPerTest() {
-	inTime = LocalDateTime.now().minusHours(1).minusMinutes(1); // To recover a parking out-time of one hour
+	inTime = LocalDateTime.now().minusHours(24).minusMinutes(1); // To recover a parking out-time of one day
 	try {
 	    when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
 	    when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
@@ -77,6 +74,19 @@ public class ParkingServiceIT {
     }
 
     @Test
+    @Tag("Incoming")
+    @DisplayName("Incoming vehicle - regular user")
+    public void givenCarEntry_whenRegularUser_thenCheckGoodTotalVisitsNumberOfTickets() {
+	when(inputReaderUtil.readSelection()).thenReturn(1);
+	when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
+	when(ticketDAO.checkNumberVisitsUser(anyString())).thenReturn(1);
+
+	parkingService.processIncomingVehicle();
+
+	verify(ticketDAO, times(1)).checkNumberVisitsUser(anyString());
+    }
+
+    @Test
     @Tag("Exiting")
     @DisplayName("Exiting vehicle - ParkingSpot updated")
     public void givenParkedCar_whenExiting_thenParkingSpotMustBeUpdated() {
@@ -91,4 +101,16 @@ public class ParkingServiceIT {
 	verify(parkingSpotDAO, times(1)).updateParking(any(ParkingSpot.class));
     }
 
+    @Test
+    @Tag("Exiting")
+    @DisplayName("Exiting vehicle - regular user")
+    public void givenCarEntry_whenRegularUser_thenCheckGoodTotalVisitsNumberOfTickes() {
+	when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
+	when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
+	when(ticketDAO.checkNumberVisitsUser(anyString())).thenReturn(2);
+
+	parkingService.processExitingVehicle();
+
+	verify(ticketDAO, times(1)).checkNumberVisitsUser(anyString());
+    }
 }

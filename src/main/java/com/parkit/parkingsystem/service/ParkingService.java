@@ -191,10 +191,11 @@ public class ParkingService {
 		    ticket = ticketDAO.getTicket(vehicleRegNumber);
 		}
 	    }
-	    LocalDateTime outTime = LocalDateTime.now();
-	    String outTimeFormatter = outTime.format(formatter);
+
 	    LocalDateTime inTime = ticket.getInTime();
 	    String inTimeFormatter = inTime.format(formatter);
+	    LocalDateTime outTime = LocalDateTime.now();
+	    String outTimeFormatter = outTime.format(formatter);
 	    ticket.setOutTime(outTime);
 	    int numberVisitsUser = ticketDAO.checkNumberVisitsUser(ticket.getVehicleRegNumber());
 
@@ -213,9 +214,10 @@ public class ParkingService {
 		ParkingSpot parkingSpot = ticket.getParkingSpot();
 		parkingSpot.setAvailable(true);
 		parkingSpotDAO.updateParking(parkingSpot);
-		logger.info("Recorded in-time : {}", inTimeFormatter);
 		DecimalFormat arroundPrice = new DecimalFormat("#0.00 €");
-		logger.info("Please pay the parking fare: {}", arroundPrice.format(ticket.getPrice()));
+		String finalTicketPrice = arroundPrice.format(ticket.getPrice());
+		logger.info("Recorded in-time : {}", inTimeFormatter);
+		logger.info("Please pay the parking fare: {}", finalTicketPrice);
 		logger.info("Recorded out-time for vehicle number: {} is: {}", ticket.getVehicleRegNumber(),
 			outTimeFormatter);
 	    } else {
