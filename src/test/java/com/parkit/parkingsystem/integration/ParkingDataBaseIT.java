@@ -3,7 +3,6 @@ package com.parkit.parkingsystem.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,6 +39,13 @@ public class ParkingDataBaseIT {
     @Mock
     private static ParkingSpot parkingSpot;
 
+    // Used to mark a half-second breakTime between two methods
+    private synchronized void breakTime() {
+	final long WAITING = 500_000_000;
+	for (long i = 0; i < WAITING; i++) {
+	}
+    }
+
     @BeforeAll
     private static void setUp() throws Exception {
 	parkingSpotDAO = new ParkingSpotDAO();
@@ -54,10 +60,6 @@ public class ParkingDataBaseIT {
 	when(inputReaderUtil.readSelection()).thenReturn(1);
 	when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
 	dataBasePrepareService.clearDataBaseEntries();
-    }
-
-    @AfterAll
-    private static void tearDown() {
     }
 
     @Test
@@ -84,7 +86,7 @@ public class ParkingDataBaseIT {
 	ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 
 	parkingService.processIncomingVehicle();
-	Thread.sleep(500);
+	breakTime();
 	parkingService.processExitingVehicle();
 	int numberTotalVisitsRegularUser = ticketDAO.checkNumberVisitsUser("ABCDEF");
 	int numberTotalVisitsNewUser = ticketDAO.checkNumberVisitsUser("012345");
@@ -102,7 +104,7 @@ public class ParkingDataBaseIT {
 	ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 
 	parkingService.processIncomingVehicle();
-	Thread.sleep(500);
+	breakTime();
 	parkingService.processExitingVehicle();
 
 	assertThat(ticketDAO.getTicket("ABCDEF").getOutTime()).isNotNull();
