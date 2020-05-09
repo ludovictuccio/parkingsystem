@@ -1,4 +1,4 @@
-package com.parkit.parkingsystem.integration;
+package com.parkit.parkingsystem.unit;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -25,7 +25,7 @@ import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 
 @ExtendWith(MockitoExtension.class)
-public class ParkingServiceIT {
+public class ParkingServiceTest {
 
     private static ParkingService parkingService;
     private Ticket ticket;
