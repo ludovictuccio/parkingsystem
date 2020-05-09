@@ -78,6 +78,11 @@
 			<artifactId>maven-project-info-reports-plugin</artifactId>
 			<version>3.0.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.spotbugs</groupId>
+			<artifactId>spotbugs-maven-plugin</artifactId>
+			<version>4.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<!-- ======================================================= -->
@@ -186,9 +191,9 @@
 				</reportSets>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>3.0.5</version>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>4.0.0</version>
 			</plugin>
 		</plugins>
 	</reporting>
