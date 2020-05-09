@@ -15,7 +15,7 @@ public class InputReaderUtil {
     /**
      * A Scanner initialization in order to read the inputs users.
      */
-    private Scanner scan = new Scanner(System.in);
+    private Scanner scan = new Scanner((System.in), "UTF-8");
     /**
      * InputReaderUtil logger.
      */

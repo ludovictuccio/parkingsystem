@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Scanner;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -29,7 +30,7 @@ public class InputReaderUtilTest {
     public void readSelection_whenEntryIsValid_returnNumberEntry() {
 	// 1,2 & 3 are valid entry
 	String input = "1";
-	InputStream inputStream = new ByteArrayInputStream((input).getBytes());
+	InputStream inputStream = new ByteArrayInputStream((input).getBytes(Charset.forName("UTF-8")));
 	Scanner scan = new Scanner(inputStream);
 	inputReaderUtil.setScan(scan);
 	assertThat(1).isEqualTo(inputReaderUtil.readSelection());
@@ -41,7 +42,7 @@ public class InputReaderUtilTest {
     public void readSelection_whenEntryIsNotValidWithNumber_returnMinusOne() {
 	// Bad entry - number
 	String input = "4";
-	InputStream inputStream = new ByteArrayInputStream((input).getBytes());
+	InputStream inputStream = new ByteArrayInputStream((input).getBytes(Charset.forName("UTF-8")));
 	Scanner scan = new Scanner(inputStream);
 	inputReaderUtil.setScan(scan);
 	assertThat(-1).isEqualTo(inputReaderUtil.readSelection());
@@ -53,7 +54,7 @@ public class InputReaderUtilTest {
     public void readSelection_whenEntryIsNotValidWithLetter_returnMinusOne() {
 	// Bad entry - letter
 	String input = "p";
-	InputStream inputStream = new ByteArrayInputStream((input).getBytes());
+	InputStream inputStream = new ByteArrayInputStream((input).getBytes(Charset.forName("UTF-8")));
 	Scanner scan = new Scanner(inputStream);
 	inputReaderUtil.setScan(scan);
 	assertThat(-1).isEqualTo(inputReaderUtil.readSelection());
@@ -65,7 +66,7 @@ public class InputReaderUtilTest {
 
     public void readVehicleRegistrationNumber_whenEntryIsValid_returnVehicleRegNumber() {
 	String vehicleRegNumber = "CL009WB";
-	InputStream inputStream = new ByteArrayInputStream((vehicleRegNumber).getBytes());
+	InputStream inputStream = new ByteArrayInputStream((vehicleRegNumber).getBytes(Charset.forName("UTF-8")));
 	Scanner scan = new Scanner(inputStream);
 	inputReaderUtil.setScan(scan);
 	inputReaderUtil.readVehicleRegistrationNumber();
@@ -77,7 +78,7 @@ public class InputReaderUtilTest {
     @DisplayName("Exception - Invalid vehicle registration number ")
     public void readVehicleRegistrationNumber_whenEntryIsNotValid_returnIllegalArgumentException() {
 	String vehicleRegNumber = "CD";
-	InputStream inputStream = new ByteArrayInputStream((vehicleRegNumber).getBytes());
+	InputStream inputStream = new ByteArrayInputStream((vehicleRegNumber).getBytes(Charset.forName("UTF-8")));
 	Scanner scan = new Scanner(inputStream);
 	inputReaderUtil.setScan(scan);
 	assertThatIllegalArgumentException().isThrownBy(() -> {
