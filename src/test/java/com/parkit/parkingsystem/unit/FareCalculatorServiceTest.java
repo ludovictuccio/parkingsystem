@@ -41,7 +41,7 @@ public class FareCalculatorServiceTest {
     @DisplayName("CAR - calculate one hour fare")
     public void calculateFareforCar_forOneHour_thenReturnsOnceTheTicketFare() {
 	ticket.setOutTime(ticket.getInTime().plusHours(1));
-	fareCalculatorService.calculateFare(ticket);
+	fareCalculatorService.calculateFare(ticket, false);
 	assertThat(Fare.CAR_RATE_PER_HOUR).isEqualTo(ticket.getPrice());
     }
 
@@ -49,7 +49,7 @@ public class FareCalculatorServiceTest {
     @DisplayName("CAR (regular user) - calculate one hour fare")
     public void calculateFareCarForRegularUser_forOneHour_thenReturnsFivePercentDiscount() {
 	ticket.setOutTime(ticket.getInTime().plusHours(1));
-	fareCalculatorService.calculateFareForRegularClient(ticket);
+	fareCalculatorService.calculateFare(ticket, true);
 	assertThat(Math.round((0.95 * Fare.CAR_RATE_PER_HOUR) * 100.0) / 100.0).isEqualTo(ticket.getPrice());
     }
 
@@ -57,7 +57,7 @@ public class FareCalculatorServiceTest {
     @DisplayName("CAR - 45 minutes parking time should give 3/4th parking fare")
     public void calculateFareCar_forPeriodBetweenThirtyAndFortyFiveminutes_returnsThreeQuartersOfFare() {
 	ticket.setOutTime(ticket.getInTime().plusMinutes(45));
-	fareCalculatorService.calculateFare(ticket);
+	fareCalculatorService.calculateFare(ticket, false);
 	assertThat(ticket.getPrice()).isEqualTo(Math.round((0.75 * Fare.CAR_RATE_PER_HOUR) * 100.0) / 100.0);
     }
 
@@ -65,7 +65,7 @@ public class FareCalculatorServiceTest {
     @DisplayName("CAR (regular user) - 45 minutes parking ")
     public void calculateFareCarForRegularUser_forPeriodBetweenThirtyAndFortyFiveminutes_returnsThreeQuartersReducedFare() {
 	ticket.setOutTime(ticket.getInTime().plusMinutes(45));
-	fareCalculatorService.calculateFareForRegularClient(ticket);
+	fareCalculatorService.calculateFare(ticket, true);
 	assertThat(ticket.getPrice()).isEqualTo((Math.round((0.75 * 0.95 * Fare.CAR_RATE_PER_HOUR) * 100.0) / 100.0));
     }
 
@@ -73,7 +73,7 @@ public class FareCalculatorServiceTest {
     @DisplayName("CAR - 30 minutes parking time must be free ")
     public void calculateFareCar_forMinusThanThirtyMinutes_returnsZero() {
 	ticket.setOutTime(ticket.getInTime().plusMinutes(29).plusSeconds(59));
-	fareCalculatorService.calculateFreeFareForLessThanThirtyMinutes(ticket);
+	fareCalculatorService.calculateFare(ticket, false);
 	assertThat(ticket.getPrice()).isEqualTo(0);
     }
 
@@ -81,7 +81,7 @@ public class FareCalculatorServiceTest {
     @DisplayName("CAR - (regular user) 30 minutes parking time must be free ")
     public void calculateFareCarForRegularUser_forMinusThanThirtyMinutes_returnsZero() {
 	ticket.setOutTime(ticket.getInTime().plusMinutes(29).plusSeconds(59));
-	fareCalculatorService.calculateFreeFareForLessThanThirtyMinutes(ticket);
+	fareCalculatorService.calculateFare(ticket, true);
 	assertThat(ticket.getPrice()).isEqualTo(0);
     }
 
@@ -89,7 +89,7 @@ public class FareCalculatorServiceTest {
     @DisplayName("CAR - 24 hours parking time should give 24 * parking fare per hour")
     public void calculateFareCar_forADayParkingTime_returnsTwentyFourTimesFare() {
 	ticket.setOutTime(ticket.getInTime().plusDays(1));
-	fareCalculatorService.calculateFare(ticket);
+	fareCalculatorService.calculateFare(ticket, false);
 	assertThat(ticket.getPrice()).isEqualTo(Math.round((24 * Fare.CAR_RATE_PER_HOUR) * 100.0) / 100.0);
     }
 
@@ -97,7 +97,7 @@ public class FareCalculatorServiceTest {
     @DisplayName("CAR (regular user) - 24 hours parking")
     public void calculateFareCarForRegularUser_forADayParkingTime_returnsTwentyFourTimesReducedFare() {
 	ticket.setOutTime(ticket.getInTime().plusDays(1));
-	fareCalculatorService.calculateFareForRegularClient(ticket);
+	fareCalculatorService.calculateFare(ticket, true);
 	assertThat(ticket.getPrice()).isEqualTo(Math.round(24 * 0.95 * Fare.CAR_RATE_PER_HOUR * 100.0) / 100.0);
     }
 
@@ -106,7 +106,7 @@ public class FareCalculatorServiceTest {
     public void givenNullPointerException_whenDetectedForCar_isThrown() {
 	parkingSpot.setParkingType(ParkingType.CAR);
 	assertThatNullPointerException().isThrownBy(() -> {
-	    fareCalculatorService.calculateFare(ticket);
+	    fareCalculatorService.calculateFare(ticket, false);
 	});
     }
 
@@ -115,7 +115,7 @@ public class FareCalculatorServiceTest {
     public void calculateFareforBike_forOneHour_thenReturnsOnceTheTicketFare() {
 	ticket.setOutTime(ticket.getInTime().plusHours(1));
 	parkingSpot.setParkingType(ParkingType.BIKE);
-	fareCalculatorService.calculateFare(ticket);
+	fareCalculatorService.calculateFare(ticket, false);
 	assertThat(Fare.BIKE_RATE_PER_HOUR).isEqualTo(ticket.getPrice());
     }
 
@@ -124,7 +124,7 @@ public class FareCalculatorServiceTest {
     public void calculateFareBikeForRegularUser_forOneHour_thenReturnsFivePercentDiscount() {
 	ticket.setOutTime(ticket.getInTime().plusHours(1));
 	parkingSpot.setParkingType(ParkingType.BIKE);
-	fareCalculatorService.calculateFareForRegularClient(ticket);
+	fareCalculatorService.calculateFare(ticket, true);
 	assertThat(0.95 * Fare.BIKE_RATE_PER_HOUR).isEqualTo(ticket.getPrice());
     }
 
@@ -133,7 +133,7 @@ public class FareCalculatorServiceTest {
     public void calculateFareBike_forPeriodBetweenThirtyAndFortyFiveminutes_returnsThreeQuartersOfFare() {
 	ticket.setOutTime(ticket.getInTime().plusMinutes(45));
 	parkingSpot.setParkingType(ParkingType.BIKE);
-	fareCalculatorService.calculateFare(ticket);
+	fareCalculatorService.calculateFare(ticket, false);
 	assertThat(ticket.getPrice()).isEqualTo(0.75 * Fare.BIKE_RATE_PER_HOUR);
     }
 
@@ -142,7 +142,7 @@ public class FareCalculatorServiceTest {
     public void calculateFareBikeForRegularUser_forPeriodBetweenThirtyAndFortyFiveminutes_returnsThreeQuartersReducedFare() {
 	ticket.setOutTime(ticket.getInTime().plusMinutes(45));
 	parkingSpot.setParkingType(ParkingType.BIKE);
-	fareCalculatorService.calculateFareForRegularClient(ticket);
+	fareCalculatorService.calculateFare(ticket, true);
 	assertThat(ticket.getPrice()).isEqualTo((Math.round((0.75 * 0.95 * Fare.BIKE_RATE_PER_HOUR) * 100.0) / 100.0));
     }
 
@@ -151,7 +151,7 @@ public class FareCalculatorServiceTest {
     public void calculateFareBike_forMinusThanThirtyMinutes_returnsZero() {
 	ticket.setOutTime(ticket.getInTime().plusMinutes(29).plusSeconds(59));
 	parkingSpot.setParkingType(ParkingType.BIKE);
-	fareCalculatorService.calculateFreeFareForLessThanThirtyMinutes(ticket);
+	fareCalculatorService.calculateFare(ticket, false);
 	assertThat(ticket.getPrice()).isEqualTo(0);
     }
 
@@ -160,7 +160,7 @@ public class FareCalculatorServiceTest {
     public void calculateFareBikeForRegularUser_forMinusThanThirtyMinutes_returnsZero() {
 	ticket.setOutTime(ticket.getInTime().plusMinutes(29).plusSeconds(59));
 	parkingSpot.setParkingType(ParkingType.BIKE);
-	fareCalculatorService.calculateFreeFareForLessThanThirtyMinutes(ticket);
+	fareCalculatorService.calculateFare(ticket, true);
 	assertThat(ticket.getPrice()).isEqualTo(0);
     }
 
@@ -169,7 +169,7 @@ public class FareCalculatorServiceTest {
     public void givenNullPointerException_whenDetectedForBike_isThrown() {
 	parkingSpot.setParkingType(ParkingType.BIKE);
 	assertThatNullPointerException().isThrownBy(() -> {
-	    fareCalculatorService.calculateFare(ticket);
+	    fareCalculatorService.calculateFare(ticket, false);
 	});
     }
 
@@ -179,7 +179,7 @@ public class FareCalculatorServiceTest {
 	ticket.setOutTime(ticket.getInTime().plusHours(1));
 	parkingSpot.setParkingType(null);
 	assertThatNullPointerException().isThrownBy(() -> {
-	    fareCalculatorService.calculateFare(ticket);
+	    fareCalculatorService.calculateFare(ticket, false);
 	});
     }
 

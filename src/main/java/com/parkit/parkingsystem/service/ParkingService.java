@@ -199,15 +199,11 @@ public class ParkingService {
 	    ticket.setOutTime(outTime);
 	    int numberVisitsUser = ticketDAO.checkNumberVisitsUser(ticket.getVehicleRegNumber());
 
-	    if (ticket.getOutTime().isBefore(ticket.getInTime().plusMinutes(30))) {
-		fareCalculatorService.calculateFreeFareForLessThanThirtyMinutes(ticket);
-
-	    } else if (numberVisitsUser >= VISITS_THRESHOLD_REGULAR_USER) {
-		fareCalculatorService.calculateFareForRegularClient(ticket);
+	    if (numberVisitsUser >= VISITS_THRESHOLD_REGULAR_USER) {
+		fareCalculatorService.calculateFare(ticket, true);
 		logger.info("As regular user you benefit from a {}% discount", 5);
-
 	    } else {
-		fareCalculatorService.calculateFare(ticket);
+		fareCalculatorService.calculateFare(ticket, false);
 	    }
 
 	    if (ticketDAO.updateTicket(ticket)) {
