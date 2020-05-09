@@ -72,10 +72,11 @@ public class ParkingService {
 	    if (parkingSpot != null && parkingSpot.getId() > 0) {
 		String vehicleRegNumber = getVehicleRegNumber();
 
-		// Check if a vehicle already has an entry ticket and check if his out-ticket is
+		// Check if a vehicle already has an in-ticket and check if his out-ticket is
 		// null to know if he's already parked
 		Ticket parkedVehicle = ticketDAO.getTicket(vehicleRegNumber);
-		// While a vehicle has already parked and didn't get out-ticket
+		// While a vehicle has already had an in-ticket and its out-ticket has not been
+		// validated (while the vehicle is already parked)
 		while (parkedVehicle != null && parkedVehicle.getOutTime() == null) {
 		    logger.error(
 			    "INVALID ENTRY \r\nThis registration is already occupied at a parking space. \r\nEnter a valid registration (or other character to exit and return to menu).");
@@ -182,14 +183,12 @@ public class ParkingService {
 	    String vehicleRegNumber = getVehicleRegNumber();
 	    Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
 
-	    if (ticket != null) {
-		// For to not recover a vehicle left with a ticket already paid
-		while (ticket != null && ticket.getOutTime() != null) {
-		    logger.error(
-			    "INVALID ENTRY \r\nThis registration has already exited the parking.\r\nEnter a valid registration (or other character to exit and return to menu).");
-		    vehicleRegNumber = getVehicleRegNumber();
-		    ticket = ticketDAO.getTicket(vehicleRegNumber);
-		}
+	    // To not recover an already paid vehicle ticket and who has left the parking
+	    while (ticket.getOutTime() != null) {
+		logger.error(
+			"INVALID ENTRY \r\nThis registration has already exited the parking.\r\nEnter a valid registration (or other character to exit and return to menu).");
+		vehicleRegNumber = getVehicleRegNumber();
+		ticket = ticketDAO.getTicket(vehicleRegNumber);
 	    }
 
 	    LocalDateTime inTime = ticket.getInTime();
@@ -217,10 +216,10 @@ public class ParkingService {
 		logger.info("Recorded out-time for vehicle number: {} is: {}", ticket.getVehicleRegNumber(),
 			outTimeFormatter);
 	    } else {
-		logger.error("Unable to update ticket information. Error occurred");
+		logger.error("Unable to update ticket information. Error occurred.");
 	    }
 	} catch (Exception e) {
-	    logger.error("Unable to process exiting vehicle");
+	    logger.error("Unable to process exiting vehicle. Please verify the entry vehicle registration number.");
 	}
     }
 }

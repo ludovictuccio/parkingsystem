@@ -95,7 +95,6 @@ public class ParkingServiceTest {
 
 	parkingService.processExitingVehicle();
 
-	verify(ticketDAO, times(1)).getTicket(anyString());
 	verify(ticketDAO, times(1)).checkNumberVisitsUser(anyString());
 	verify(ticketDAO, times(1)).updateTicket(any(Ticket.class));
 	verify(parkingSpotDAO, times(1)).updateParking(any(ParkingSpot.class));
