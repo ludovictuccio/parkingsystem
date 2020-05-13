@@ -33,17 +33,21 @@ public class ParkingDataBaseIT {
     private static ParkingSpotDAO parkingSpotDAO;
     private static TicketDAO ticketDAO;
     private static DataBasePrepareService dataBasePrepareService;
+    private static String vehicleRegNumber = "ABCDEF";
 
     @Mock
     private static InputReaderUtil inputReaderUtil;
     @Mock
     private static ParkingSpot parkingSpot;
 
-    // Used to mark a half-second breakTime between two methods
-    private synchronized void breakTime() {
-	final long WAITING = 500_000_000;
-	for (long i = 0; i < WAITING; i++) {
-	}
+    /**
+     * Used to mark a half-second breakTime between two methods
+     * 
+     * @throws InterruptedException
+     */
+    private synchronized void halfSecondBreak() throws InterruptedException {
+	final long HALF_SECOND = 500;
+	Thread.sleep(HALF_SECOND);
     }
 
     @BeforeAll
@@ -52,14 +56,14 @@ public class ParkingDataBaseIT {
 	ticketDAO = new TicketDAO();
 	dataBasePrepareService = new DataBasePrepareService();
 	parkingSpotDAO.setDataBaseConfig(dataBaseTestConfig);
-	ticketDAO.setDataBaseConfig(dataBaseTestConfig);
     }
 
     @BeforeEach
     private void setUpPerTest() throws Exception {
+	dataBasePrepareService.clearDataBaseEntries(); // Clear for independents tests
 	when(inputReaderUtil.readSelection()).thenReturn(1);
-	when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
-	dataBasePrepareService.clearDataBaseEntries();
+	when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(vehicleRegNumber);
+	ticketDAO.setDataBaseConfig(dataBaseTestConfig);
     }
 
     @Test
@@ -72,7 +76,7 @@ public class ParkingDataBaseIT {
 	parkingService.processIncomingVehicle();
 	parkingSpot = parkingService.getNextParkingNumberIfAvailable();
 
-	assertThat(ticketDAO.getTicket("ABCDEF")).isNotNull(); // Check ticket saved in DB
+	assertThat(ticketDAO.getTicket(vehicleRegNumber)).isNotNull(); // Check ticket saved in DB
 	assertThat(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR) > 1).isTrue(); // Check vehicle parking spot
 										       // unavailable
     }
@@ -86,9 +90,9 @@ public class ParkingDataBaseIT {
 	ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 
 	parkingService.processIncomingVehicle();
-	breakTime();
+	halfSecondBreak();
 	parkingService.processExitingVehicle();
-	int numberTotalVisitsRegularUser = ticketDAO.checkNumberVisitsUser("ABCDEF");
+	int numberTotalVisitsRegularUser = ticketDAO.checkNumberVisitsUser(vehicleRegNumber);
 	int numberTotalVisitsNewUser = ticketDAO.checkNumberVisitsUser("012345");
 
 	assertThat(1).isEqualTo(numberTotalVisitsRegularUser); // Check that tickets are saved in DB
@@ -104,11 +108,11 @@ public class ParkingDataBaseIT {
 	ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 
 	parkingService.processIncomingVehicle();
-	breakTime();
+	halfSecondBreak();
 	parkingService.processExitingVehicle();
 
-	assertThat(ticketDAO.getTicket("ABCDEF").getOutTime()).isNotNull();
-	assertThat(ticketDAO.getTicket("ABCDEF").getPrice()).isNotNull(); // Verify that exit process work
-	assertThat(ticketDAO.getTicket("ABCDEF").getPrice()).isEqualTo(0.0);
+	assertThat(ticketDAO.getTicket(vehicleRegNumber).getOutTime()).isNotNull();
+	assertThat(ticketDAO.getTicket(vehicleRegNumber).getPrice()).isNotNull(); // Verify that exit process work
+	assertThat(ticketDAO.getTicket(vehicleRegNumber).getPrice()).isEqualTo(0.0);
     }
 }
