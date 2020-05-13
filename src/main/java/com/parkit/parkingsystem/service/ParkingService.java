@@ -197,22 +197,17 @@ public class ParkingService {
 	    String outTimeFormatter = outTime.format(formatter);
 	    ticket.setOutTime(outTime);
 	    int numberVisitsUser = ticketDAO.checkNumberVisitsUser(ticket.getVehicleRegNumber());
-
-	    if (numberVisitsUser >= VISITS_THRESHOLD_REGULAR_USER) {
-		fareCalculatorService.calculateFare(ticket, true);
-		logger.info("As regular user you benefit from a {}% discount", 5);
-	    } else {
-		fareCalculatorService.calculateFare(ticket, false);
-	    }
+	    boolean isRegularUser = numberVisitsUser >= VISITS_THRESHOLD_REGULAR_USER;
+	    fareCalculatorService.calculateFare(ticket, isRegularUser);
 
 	    if (ticketDAO.updateTicket(ticket)) {
 		ParkingSpot parkingSpot = ticket.getParkingSpot();
 		parkingSpot.setAvailable(true);
 		parkingSpotDAO.updateParking(parkingSpot);
-		DecimalFormat arroundPrice = new DecimalFormat("#0.00 €");
-		String finalTicketPrice = arroundPrice.format(ticket.getPrice());
+		DecimalFormat roundedPrice = new DecimalFormat("#0.00 €");
+		String finalTicketPriceRounded = roundedPrice.format(ticket.getPrice());
 		logger.info("Recorded in-time : {}", inTimeFormatter);
-		logger.info("Please pay the parking fare: {}", finalTicketPrice);
+		logger.info("Please pay the parking fare: {}", finalTicketPriceRounded);
 		logger.info("Recorded out-time for vehicle number: {} is: {}", ticket.getVehicleRegNumber(),
 			outTimeFormatter);
 	    } else {
