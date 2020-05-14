@@ -19,10 +19,6 @@ public class FareCalculatorService {
      * FareCalculatorService logger.
      */
     private static Logger logger = LogManager.getLogger("FareCalculatorService");
-    /**
-     * Double variable, defines the vehicle hourly fare.
-     */
-    private static double vehicleRatePerHour = 0;
 
     /**
      * This method check errors during the exit parking process
@@ -40,12 +36,27 @@ public class FareCalculatorService {
     }
 
     /**
-     * This method calculate ticket duration
+     * This method calculate ticket fare with different durations for new & regular
+     * user
      * 
-     * @param ticket duration
+     * @param ticket fare
      */
-    private static void calculateDuration(Ticket ticket) {
+    public void calculateFare(Ticket ticket, boolean isRegularUser) {
 	checkErrorsWhenVehiculeIsExitingParking(ticket);
+	double vehicleRatePerHour = 0;
+	switch (ticket.getParkingSpot().getParkingType()) {
+	case CAR: {
+	    vehicleRatePerHour = Fare.CAR_RATE_PER_HOUR;
+	    break;
+	}
+	case BIKE: {
+	    vehicleRatePerHour = Fare.BIKE_RATE_PER_HOUR;
+	    break;
+	}
+	default:
+	    throw new IllegalArgumentException("Unkown Parking Type");
+	}
+
 	LocalDateTime inHour = ticket.getInTime();
 	LocalDateTime outHour = ticket.getOutTime();
 	Duration durationOfTicket = Duration.between(inHour, outHour);
@@ -73,30 +84,6 @@ public class FareCalculatorService {
 		    "An error was occured. Please try again in a few moments or contact our technical support.");
 	}
 	ticket.setPrice(ticketPrice);
-    }
-
-    /**
-     * This method calculate ticket fare for new & regular user
-     * 
-     * @param ticket fare
-     */
-    public void calculateFare(Ticket ticket, boolean isRegularUser) {
-	checkErrorsWhenVehiculeIsExitingParking(ticket);
-	vehicleRatePerHour = 0;
-	switch (ticket.getParkingSpot().getParkingType()) {
-	case CAR: {
-	    vehicleRatePerHour = Fare.CAR_RATE_PER_HOUR;
-	    break;
-	}
-	case BIKE: {
-	    vehicleRatePerHour = Fare.BIKE_RATE_PER_HOUR;
-	    break;
-	}
-	default:
-	    throw new IllegalArgumentException("Unkown Parking Type");
-	}
-
-	calculateDuration(ticket);
 
 	if (isRegularUser) {
 	    ticket.setPrice(0.95 * ticket.getPrice()); // Set the ticket price with a 5% discount for regular users

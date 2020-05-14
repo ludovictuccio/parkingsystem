@@ -197,8 +197,7 @@ public class ParkingService {
 	    String outTimeFormatter = outTime.format(formatter);
 	    ticket.setOutTime(outTime);
 	    int numberVisitsUser = ticketDAO.checkNumberVisitsUser(ticket.getVehicleRegNumber());
-	    boolean isRegularUser = numberVisitsUser >= VISITS_THRESHOLD_REGULAR_USER;
-	    fareCalculatorService.calculateFare(ticket, isRegularUser);
+	    fareCalculatorService.calculateFare(ticket, numberVisitsUser >= VISITS_THRESHOLD_REGULAR_USER);
 
 	    if (ticketDAO.updateTicket(ticket)) {
 		ParkingSpot parkingSpot = ticket.getParkingSpot();
