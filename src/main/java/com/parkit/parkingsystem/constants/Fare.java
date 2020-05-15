@@ -5,19 +5,19 @@ package com.parkit.parkingsystem.constants;
  */
 public final class Fare {
 
-    /**
-     * Empty fare constructor.
-     */
-    private Fare() {
+   /**
+    * Empty fare constructor.
+    */
+   private Fare() {
 
-    }
+   }
 
-    /**
-     * Parking bike hourly fare.
-     */
-    public static final double BIKE_RATE_PER_HOUR = 1.0;
-    /**
-     * Parking car hourly fare.
-     */
-    public static final double CAR_RATE_PER_HOUR = 1.5;
+   /**
+    * Parking bike hourly fare.
+    */
+   public static final double BIKE_RATE_PER_HOUR = 1.0;
+   /**
+    * Parking car hourly fare.
+    */
+   public static final double CAR_RATE_PER_HOUR = 1.5;
 }
