@@ -17,70 +17,109 @@ import com.parkit.parkingsystem.constants.DBConstants;
 
 public class DataBaseConfigTest {
 
-    private DataBaseConfig dataBaseConfig;
+   private static DataBaseConfig dataBaseConfig;
 
-    @BeforeEach
-    public void setUpPerTest() {
-	dataBaseConfig = new DataBaseConfig();
-    }
+   @BeforeEach
+   public void setUpPerTest() {
+      dataBaseConfig = new DataBaseConfig();
+   }
 
-    @Test
-    @Tag("Connection")
-    @DisplayName("Get Connection")
-    public void givenDataBase_whenGetConnection_thenConnectionShouldBeEstablished()
-	    throws ClassNotFoundException, SQLException {
+   @Test
+   @Tag("Connection")
+   @DisplayName("Get Connection")
+   public void givenDataBase_whenGetConnection_thenConnectionShouldBeEstablished()
+               throws ClassNotFoundException, SQLException {
 
-	Connection con;
+      Connection con;
 
-	con = dataBaseConfig.getConnection();
+      con = dataBaseConfig.getConnection();
 
-	assertThat(con).isNotNull();
-    }
+      assertThat(con).isNotNull();
+   }
 
-    @Test
-    @Tag("Connection")
-    @DisplayName("Connection closed")
-    public void givenDataBase_whenCloseConnection_thenConnectionShouldBeClosed()
-	    throws ClassNotFoundException, SQLException {
+   @Test
+   @Tag("Connection")
+   @DisplayName("Connection closed")
+   public void givenDataBase_whenCloseConnection_thenConnectionShouldBeClosed()
+               throws ClassNotFoundException, SQLException {
 
-	Connection con;
-	con = dataBaseConfig.getConnection();
+      Connection con;
+      con = dataBaseConfig.getConnection();
 
-	dataBaseConfig.closeConnection(con);
+      dataBaseConfig.closeConnection(con);
 
-	assertThat(con.isClosed()).isTrue();
-    }
+      assertThat(con.isClosed()).isTrue();
+   }
 
-    @Test
-    @Tag("PreparedStatement")
-    @DisplayName("PreparedStatement closed")
-    public void givenDataBaseConnection_whenClosePreparedStatement_thenPreparedStatementShouldBeClosed()
-	    throws ClassNotFoundException, SQLException {
+   @Test
+   @Tag("Connection")
+   @DisplayName("Null connection")
+   public void givenDataBaseWithNullConnection_whenGetConnection_thenReturnNullConnection()
+               throws ClassNotFoundException, SQLException {
 
-	Connection con;
-	con = dataBaseConfig.getConnection();
-	PreparedStatement ps = con.prepareStatement(DBConstants.GET_TICKET);
+      Connection con = null;
 
-	dataBaseConfig.closePreparedStatement(ps);
+      dataBaseConfig.getConnection();
 
-	assertThat(ps.isClosed()).isTrue();
-    }
+      assertThat(con).isNull();
+   }
 
-    @Test
-    @Tag("ResultSet")
-    @DisplayName("ResultSet closed")
-    public void givenDataBaseConnection_whenCloseResultSet_thenResultSetShouldBeClosed()
-	    throws ClassNotFoundException, SQLException {
+   @Test
+   @Tag("PreparedStatement")
+   @DisplayName("PreparedStatement closed")
+   public void givenDataBaseConnection_whenClosePreparedStatement_thenPreparedStatementShouldBeClosed()
+               throws ClassNotFoundException, SQLException {
 
-	Connection con;
-	con = dataBaseConfig.getConnection();
-	ResultSet rs = null;
-	PreparedStatement ps = con.prepareStatement(DBConstants.GET_TICKET);
-	ps.setString(1, "CAR");
-	rs = ps.executeQuery();
+      Connection con;
+      con = dataBaseConfig.getConnection();
+      PreparedStatement ps = con.prepareStatement(DBConstants.GET_TICKET);
 
-	dataBaseConfig.closeResultSet(rs);
+      dataBaseConfig.closePreparedStatement(ps);
 
-	assertThat(rs.isClosed()).isTrue();
-    }
+      assertThat(ps.isClosed()).isTrue();
+   }
+
+   @Test
+   @Tag("PreparedStatement")
+   @DisplayName("Null preparedStatement")
+   public void givenDataBaseWithNullPreparedStatement_whenGetPreparedStatement_thenReturnNullPreparedStatement()
+               throws ClassNotFoundException, SQLException {
+
+      PreparedStatement ps = null;
+
+      dataBaseConfig.getConnection();
+
+      assertThat(ps).isNull();
+   }
+
+   @Test
+   @Tag("ResultSet")
+   @DisplayName("ResultSet closed")
+   public void givenDataBaseConnection_whenCloseResultSet_thenResultSetShouldBeClosed()
+               throws ClassNotFoundException, SQLException {
+
+      Connection con;
+      con = dataBaseConfig.getConnection();
+      ResultSet rs = null;
+      PreparedStatement ps = con.prepareStatement(DBConstants.GET_TICKET);
+      ps.setString(1, "CAR");
+      rs = ps.executeQuery();
+
+      dataBaseConfig.closeResultSet(rs);
+
+      assertThat(rs.isClosed()).isTrue();
+   }
+
+   @Test
+   @Tag("ResultSet")
+   @DisplayName("Null ResultSet")
+   public void givenDataBaseWithNullResultSet_whenGetResultSet_thenReturnNullResultSet()
+               throws ClassNotFoundException, SQLException {
+
+      ResultSet rs = null;
+
+      dataBaseConfig.getConnection();
+
+      assertThat(rs).isNull();
+   }
 }

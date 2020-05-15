@@ -17,72 +17,189 @@ import com.parkit.parkingsystem.util.InputReaderUtil;
 
 public class InputReaderUtilTest {
 
-    private static InputReaderUtil inputReaderUtil;
+   private static InputReaderUtil inputReaderUtil;
+   private static InputStream inputStream;
+   private static Scanner scan;
+   private static String input, vehicleRegNumber;
 
-    @BeforeAll
-    private static void setUp() {
-	inputReaderUtil = new InputReaderUtil();
-    }
+   @BeforeAll
+   private static void setUp() {
+      inputReaderUtil = new InputReaderUtil();
+   }
 
-    @Tag("ReadSelection")
-    @Test
-    @DisplayName("Valid user selection")
-    public void readSelection_whenEntryIsValid_returnNumberEntry() {
-	// 1,2 & 3 are valid entry
-	String input = "1";
-	InputStream inputStream = new ByteArrayInputStream((input).getBytes(Charset.forName("UTF-8")));
-	Scanner scan = new Scanner(inputStream);
-	inputReaderUtil.setScan(scan);
-	assertThat(1).isEqualTo(inputReaderUtil.readSelection());
-    }
+   @Test
+   @Tag("ReadSelection")
+   @DisplayName("Valid user selection")
+   public void givenReadSelection_whenEntryIsValidAndMiniEntryAllow_thenReturnNumberEntry() {
+      // 1,2 & 3 are valid entry
+      input = "1";
+      inputStream = new ByteArrayInputStream(
+                  (input).getBytes(Charset.forName("UTF-8")));
+      scan = new Scanner(inputStream);
+      inputReaderUtil.setScan(scan);
+      assertThat(1).isEqualTo(inputReaderUtil.readSelection());
+   }
 
-    @Tag("ReadSelection")
-    @Test
-    @DisplayName("Invalid user selection (number)")
-    public void readSelection_whenEntryIsNotValidWithNumber_returnMinusOne() {
-	// Bad entry - number
-	String input = "4";
-	InputStream inputStream = new ByteArrayInputStream((input).getBytes(Charset.forName("UTF-8")));
-	Scanner scan = new Scanner(inputStream);
-	inputReaderUtil.setScan(scan);
-	assertThat(-1).isEqualTo(inputReaderUtil.readSelection());
-    }
+   @Test
+   @Tag("ReadSelection")
+   @DisplayName("Invalid user selection (negative number)")
+   public void givenReadSelection_whenEntryIsNegativeNumber_thenReturnMinusOne() {
+      // 1,2 & 3 are valid entry
+      input = "-1";
+      inputStream = new ByteArrayInputStream(
+                  (input).getBytes(Charset.forName("UTF-8")));
+      scan = new Scanner(inputStream);
+      inputReaderUtil.setScan(scan);
+      assertThat(-1).isEqualTo(inputReaderUtil.readSelection());
+   }
 
-    @Tag("ReadSelection")
-    @Test
-    @DisplayName("Invalid user selection (letter)")
-    public void readSelection_whenEntryIsNotValidWithLetter_returnMinusOne() {
-	// Bad entry - letter
-	String input = "p";
-	InputStream inputStream = new ByteArrayInputStream((input).getBytes(Charset.forName("UTF-8")));
-	Scanner scan = new Scanner(inputStream);
-	inputReaderUtil.setScan(scan);
-	assertThat(-1).isEqualTo(inputReaderUtil.readSelection());
-    }
+   @Test
+   @Tag("ReadSelection")
+   @DisplayName("Invalid user selection (symbol)")
+   public void givenReadSelection_whenEntryIsSymbol_thenReturnMinusOne() {
+      // 1,2 & 3 are valid entry
+      input = "-";
+      inputStream = new ByteArrayInputStream(
+                  (input).getBytes(Charset.forName("UTF-8")));
+      scan = new Scanner(inputStream);
+      inputReaderUtil.setScan(scan);
+      assertThat(-1).isEqualTo(inputReaderUtil.readSelection());
+   }
 
-    @Tag("ReadVehicleRegistrationNumber")
-    @Test
-    @DisplayName("Valid vehicle registration number")
+   @Test
+   @Tag("ReadSelection")
+   @DisplayName("Invalid user selection (number)")
+   public void givenReadSelection_whenEntryIsNotValidWithNumber_thenReturnMinusOne() {
+      // Bad entry - number
+      input = "4";
+      inputStream = new ByteArrayInputStream(
+                  (input).getBytes(Charset.forName("UTF-8")));
+      scan = new Scanner(inputStream);
+      inputReaderUtil.setScan(scan);
+      assertThat(-1).isEqualTo(inputReaderUtil.readSelection());
+   }
 
-    public void readVehicleRegistrationNumber_whenEntryIsValid_returnVehicleRegNumber() {
-	String vehicleRegNumber = "CL009WB";
-	InputStream inputStream = new ByteArrayInputStream((vehicleRegNumber).getBytes(Charset.forName("UTF-8")));
-	Scanner scan = new Scanner(inputStream);
-	inputReaderUtil.setScan(scan);
-	inputReaderUtil.readVehicleRegistrationNumber();
-	assertThat(vehicleRegNumber).hasSizeGreaterThan(3).hasSizeLessThan(8);
-    }
+   @Test
+   @Tag("ReadSelection")
+   @DisplayName("Invalid user selection (letter)")
+   public void givenReadSelection_whenEntryIsNotValidWithLetter_thenReturnMinusOne() {
+      // Bad entry - letter
+      input = "p";
+      inputStream = new ByteArrayInputStream(
+                  (input).getBytes(Charset.forName("UTF-8")));
+      scan = new Scanner(inputStream);
+      inputReaderUtil.setScan(scan);
+      assertThat(-1).isEqualTo(inputReaderUtil.readSelection());
+   }
 
-    @Tag("ReadVehicleRegistrationNumber")
-    @Test
-    @DisplayName("Exception - Invalid vehicle registration number ")
-    public void readVehicleRegistrationNumber_whenEntryIsNotValid_returnIllegalArgumentException() {
-	String vehicleRegNumber = "CD";
-	InputStream inputStream = new ByteArrayInputStream((vehicleRegNumber).getBytes(Charset.forName("UTF-8")));
-	Scanner scan = new Scanner(inputStream);
-	inputReaderUtil.setScan(scan);
-	assertThatIllegalArgumentException().isThrownBy(() -> {
-	    inputReaderUtil.readVehicleRegistrationNumber();
-	});
-    }
+   @Test
+   @Tag("ReadSelection")
+   @DisplayName("Invalid user selections - letter number and symbols")
+   public void givenReadSelection_whenEntryIsNotValidWithLetterNumberAndSymbols_thenReturnMinusOne() {
+      // Bad entry - letter
+      input = "-15p*";
+      inputStream = new ByteArrayInputStream(
+                  (input).getBytes(Charset.forName("UTF-8")));
+      scan = new Scanner(inputStream);
+      inputReaderUtil.setScan(scan);
+      assertThat(-1).isEqualTo(inputReaderUtil.readSelection());
+   }
+
+   @Test
+   @Tag("ReadVehicleRegistrationNumber")
+   @DisplayName("Valid vehicle registration number - uppercase")
+   public void givenReadVehicleRegistrationNumber_whenEntryIsValidInUpeercase_thenReturnVehicleRegNumber() {
+      vehicleRegNumber = "CL009WB";
+      inputStream = new ByteArrayInputStream(
+                  (vehicleRegNumber).getBytes(Charset.forName("UTF-8")));
+      scan = new Scanner(inputStream);
+      inputReaderUtil.setScan(scan);
+      inputReaderUtil.readVehicleRegistrationNumber();
+      assertThat(vehicleRegNumber).hasSizeGreaterThan(3).hasSizeLessThan(8);
+      assertThat(vehicleRegNumber).isEqualTo("CL009WB");
+   }
+
+   @Test
+   @Tag("ReadVehicleRegistrationNumber")
+   @DisplayName("Valid vehicle registration number - lowercase")
+   public void givenReadVehicleRegistrationNumber_whenEntryIsValidInLowercase_thenReturnVehicleRegNumber() {
+      vehicleRegNumber = "cl009wb";
+      inputStream = new ByteArrayInputStream(
+                  (vehicleRegNumber).getBytes(Charset.forName("UTF-8")));
+      scan = new Scanner(inputStream);
+      inputReaderUtil.setScan(scan);
+      inputReaderUtil.readVehicleRegistrationNumber();
+      assertThat(vehicleRegNumber).hasSizeGreaterThan(3).hasSizeLessThan(8);
+      assertThat(vehicleRegNumber).isEqualTo("cl009wb");
+   }
+
+   @Test
+   @Tag("ReadVehicleRegistrationNumber")
+   @DisplayName("Exception - Invalid vehicle registration number ")
+   public void givenReadVehicleRegistrationNumber_whenEntryIsNotValid_thenReturnIllegalArgumentException() {
+      vehicleRegNumber = "CD";
+      inputStream = new ByteArrayInputStream(
+                  (vehicleRegNumber).getBytes(Charset.forName("UTF-8")));
+      scan = new Scanner(inputStream);
+      inputReaderUtil.setScan(scan);
+      assertThatIllegalArgumentException().isThrownBy(() -> {
+         inputReaderUtil.readVehicleRegistrationNumber();
+      });
+   }
+
+   @Test
+   @Tag("ReadVehicleRegistrationNumber")
+   @DisplayName("Exception - Invalid vehicle registration number - more than maxi size ")
+   public void givenReadVehicleRegistrationNumber_whenEntryIsMoreThanMaxiAllowedSize_thenReturnIllegalArgumentException() {
+      vehicleRegNumber = "*MOREthanMAXIsize123*";
+      inputStream = new ByteArrayInputStream(
+                  (vehicleRegNumber).getBytes(Charset.forName("UTF-8")));
+      scan = new Scanner(inputStream);
+      inputReaderUtil.setScan(scan);
+      assertThatIllegalArgumentException().isThrownBy(() -> {
+         inputReaderUtil.readVehicleRegistrationNumber();
+      });
+   }
+
+   @Test
+   @Tag("ReadVehicleRegistrationNumber")
+   @DisplayName("Exception - Invalid vehicle registration number - only symbols")
+   public void givenReadVehicleRegistrationNumber_whenEntryNumberValidButOnlySymbols_thenReturnIllegalArgumentException() {
+      vehicleRegNumber = "-_-_-_-";
+      inputStream = new ByteArrayInputStream(
+                  (vehicleRegNumber).getBytes(Charset.forName("UTF-8")));
+      scan = new Scanner(inputStream);
+      inputReaderUtil.setScan(scan);
+      assertThatIllegalArgumentException().isThrownBy(() -> {
+         inputReaderUtil.readVehicleRegistrationNumber();
+      });
+   }
+
+   @Test
+   @Tag("ReadVehicleRegistrationNumber")
+   @DisplayName("Exception - Invalid vehicle registration number - more than maxi size with spaces")
+   public void givenReadVehicleRegistrationNumber_whenEntryIsMoreThanMaxiAllowedSizeWithSpaces_thenReturnIllegalArgumentException() {
+      vehicleRegNumber = "*MORE than MAXI size 123*";
+      inputStream = new ByteArrayInputStream(
+                  (vehicleRegNumber).getBytes(Charset.forName("UTF-8")));
+      scan = new Scanner(inputStream);
+      inputReaderUtil.setScan(scan);
+      assertThatIllegalArgumentException().isThrownBy(() -> {
+         inputReaderUtil.readVehicleRegistrationNumber();
+      });
+   }
+
+   @Test
+   @Tag("ReadVehicleRegistrationNumber")
+   @DisplayName("Exception - Invalid vehicle registration number - space")
+   public void givenReadVehicleRegistrationNumber_whenInvalidEntryWithSpace_thenReturnIllegalArgumentException() {
+      vehicleRegNumber = " ";
+      inputStream = new ByteArrayInputStream(
+                  (vehicleRegNumber).getBytes(Charset.forName("UTF-8")));
+      scan = new Scanner(inputStream);
+      inputReaderUtil.setScan(scan);
+      assertThatIllegalArgumentException().isThrownBy(() -> {
+         inputReaderUtil.readVehicleRegistrationNumber();
+      });
+   }
 }
