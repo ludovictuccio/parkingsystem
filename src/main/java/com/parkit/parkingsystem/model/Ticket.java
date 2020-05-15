@@ -2,60 +2,144 @@ package com.parkit.parkingsystem.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * This class is used to store ticket data.
+ */
 public class Ticket {
+   /**
+    * The parking spot number allocated to the vehicle.
+    */
+   private ParkingSpot parkingSpot;
+   /**
+    * The parking entry time.
+    */
+   private LocalDateTime inTimeTicket;
+   /**
+    * The parking exit time.
+    */
+   private LocalDateTime outTimeTicket;
+   /**
+    * The vehicle registration number.
+    */
+   private String vehicleRegNumber;
+   /**
+    * The unique ticket identifier.
+    */
+   private int id;
+   /**
+    * The price to pay during exiting process depending on parking time.
+    */
+   private double price;
+   /**
+    * Variable used to round price.
+    */
+   private static final double ROUNDER = 100.0;
 
-    private int id;
-    private ParkingSpot parkingSpot;
-    private String vehicleRegNumber;
-    private double price;
-    private LocalDateTime inTime;
-    private LocalDateTime outTime;
+   /**
+    * Getter of id ticket.
+    *
+    * @return id ticket, an int
+    */
+   public int getId() {
+      return id;
+   }
 
-    public int getId() {
-	return id;
-    }
+   /**
+    * Setter of id ticket.
+    *
+    * @param identifiant the id ticket
+    */
+   public void setId(final int identifiant) {
+      this.id = identifiant;
+   }
 
-    public void setId(int id) {
-	this.id = id;
-    }
+   /**
+    * Getter of parkingSpot ticket.
+    *
+    * @return parkingSpot
+    */
+   public ParkingSpot getParkingSpot() {
+      return parkingSpot;
+   }
 
-    public ParkingSpot getParkingSpot() {
-	return parkingSpot;
-    }
+   /**
+    * Setter of parkingSpot ticket.
+    *
+    * @param parkSpot
+    */
+   public void setParkingSpot(final ParkingSpot parkSpot) {
+      this.parkingSpot = parkSpot;
+   }
 
-    public void setParkingSpot(ParkingSpot parkingSpot) {
-	this.parkingSpot = parkingSpot;
-    }
+   /**
+    * Getter of vehicle registration number ticket.
+    *
+    * @return String vehicleRegNumber, the vehicle registration number
+    */
+   public String getVehicleRegNumber() {
+      return vehicleRegNumber;
+   }
 
-    public String getVehicleRegNumber() {
-	return vehicleRegNumber;
-    }
+   /**
+    * Setter of vehicle registration number ticket.
+    *
+    * @param vhlRegistration the vehicle registration number to set
+    */
+   public void setVehicleRegNumber(final String vhlRegistration) {
+      this.vehicleRegNumber = vhlRegistration;
+   }
 
-    public void setVehicleRegNumber(String vehicleRegNumber) {
-	this.vehicleRegNumber = vehicleRegNumber;
-    }
+   /**
+    * Getter of ticket price.
+    *
+    * @return double price, the price to pay during exiting process
+    */
+   public double getPrice() {
+      return Math.round(price * ROUNDER) / ROUNDER;
+   }
 
-    public double getPrice() {
-	return Math.round(price * 100.0) / 100.0;
-    }
+   /**
+    * Setter of ticket price.
+    *
+    * @param ticketPrice the price to set on ticket
+    */
+   public void setPrice(final double ticketPrice) {
+      this.price = ticketPrice;
+   }
 
-    public void setPrice(double price) {
-	this.price = price;
-    }
+   /**
+    * Getter of ticket inTime.
+    *
+    * @return inTimeTicket the ticket entry time
+    */
+   public LocalDateTime getInTime() {
+      return inTimeTicket;
+   }
 
-    public LocalDateTime getInTime() {
-	return inTime;
-    }
+   /**
+    * Setter of ticket inTime.
+    *
+    * @param ticketInTime the LocalDateTime of ticket entry time
+    */
+   public void setInTime(final LocalDateTime ticketInTime) {
+      this.inTimeTicket = ticketInTime;
+   }
 
-    public void setInTime(LocalDateTime inTime) {
-	this.inTime = inTime;
-    }
+   /**
+    * Getter of ticket outTime.
+    *
+    * @return outTimeTicket the ticket exit time
+    */
+   public LocalDateTime getOutTime() {
+      return outTimeTicket;
+   }
 
-    public LocalDateTime getOutTime() {
-	return outTime;
-    }
-
-    public void setOutTime(LocalDateTime outTime) {
-	this.outTime = outTime;
-    }
+   /**
+    * Setter of ticket outTime.
+    *
+    * @param ticketOutTime the LocalDateTime of ticket exit time
+    */
+   public void setOutTime(final LocalDateTime ticketOutTime) {
+      this.outTimeTicket = ticketOutTime;
+   }
 }

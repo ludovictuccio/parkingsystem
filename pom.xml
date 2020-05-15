@@ -78,6 +78,11 @@
 			<artifactId>maven-project-info-reports-plugin</artifactId>
 			<version>3.0.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.spotbugs</groupId>
+			<artifactId>spotbugs-maven-plugin</artifactId>
+			<version>4.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<!-- ======================================================= -->
@@ -159,6 +164,11 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.9.0</version>
 			</plugin>
 		</plugins>
 	</build>

@@ -7,51 +7,70 @@ import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 
-public class InteractiveShell {
+/**
+ * This class is used to display the application main menu.
+ */
+public final class InteractiveShell {
+   /**
+    * InteractiveShell logger.
+    */
+   private static final Logger LOG = LogManager.getLogger("InteractiveShell");
+   /**
+    * An int for exit option to avoid Magic Number.
+    */
+   private static final int EXIT_OPTION = 3;
 
-    private InteractiveShell() {
+   /**
+    * Empty InteractiveShell constructor.
+    */
+   private InteractiveShell() {
 
-    }
+   }
 
-    private static final Logger logger = LogManager.getLogger("InteractiveShell");
+   /**
+    * This display method manages the main menu of the application. Users can
+    * choose between enter or exit a vehicle from the parking.
+    */
+   public static void loadInterface() {
 
-    public static void loadInterface() {
+      LOG.info("Welcome to Parking System!");
 
-	logger.info("Welcome to Parking System!");
+      boolean continueApp = true;
+      InputReaderUtil inputReaderUtil = new InputReaderUtil();
+      ParkingSpotDAO parkingSpotDAO = new ParkingSpotDAO();
+      TicketDAO ticketDAO = new TicketDAO();
+      ParkingService parkingService = new ParkingService(inputReaderUtil,
+                  parkingSpotDAO, ticketDAO);
 
-	boolean continueApp = true;
-	InputReaderUtil inputReaderUtil = new InputReaderUtil();
-	ParkingSpotDAO parkingSpotDAO = new ParkingSpotDAO();
-	TicketDAO ticketDAO = new TicketDAO();
-	ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+      while (continueApp) {
+         loadMenu();
+         int option = inputReaderUtil.readSelection();
+         switch (option) {
+         case 1:
+            parkingService.processIncomingVehicle();
+            break;
+         case 2:
+            parkingService.processExitingVehicle();
+            break;
+         case EXIT_OPTION:
+            LOG.info("Exiting from the system!");
+            continueApp = false;
+            break;
+         default:
+            LOG.info("Unsupported option. Please enter a "
+                        + "number corresponding to the provided menu");
+         }
+      }
+   }
 
-	while (continueApp) {
-	    loadMenu();
-	    int option = inputReaderUtil.readSelection();
-	    switch (option) {
-	    case 1: {
-		parkingService.processIncomingVehicle();
-		break;
-	    }
-	    case 2: {
-		parkingService.processExitingVehicle();
-		break;
-	    }
-	    case 3: {
-		logger.info("Exiting from the system!");
-		continueApp = false;
-		break;
-	    }
-	    default:
-		logger.info("Unsupported option. Please enter a number corresponding to the provided menu");
-	    }
-	}
-    }
-
-    private static void loadMenu() {
-	logger.info("Please select an option. Simply enter the number to choose an action");
-	logger.info("1 New Vehicle Entering - Allocate Parking Space");
-	logger.info("2 Vehicle Exiting - Generate Ticket Price");
-	logger.info("3 Shutdown System");
-    }
+   /**
+    * This method display the main menu.
+    */
+   private static void loadMenu() {
+      LOG.info("Please select an option."
+                  + " Simply enter the number to choose an action");
+      LOG.info("1 New Vehicle Entering - Allocate Parking Space");
+      LOG.info("2 Vehicle Exiting - Generate Ticket Price");
+      LOG.info("3 Shutdown System");
+   }
 }

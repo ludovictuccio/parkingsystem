@@ -1,4 +1,4 @@
-package com.parkit.parkingsystem.database;
+package com.parkit.parkingsystem.integration.database;
 
 import java.sql.Connection;
 
