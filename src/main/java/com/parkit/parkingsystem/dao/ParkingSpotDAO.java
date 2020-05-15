@@ -38,7 +38,7 @@ public class ParkingSpotDAO {
     * Check if a parking slot is available or not.
     *
     * @param parkingType the vehicle type (bike or car)
-    * @return int result (the id ParkingSpot) or -1 if a parking slot is
+    * @return result int (the id ParkingSpot) or -1 if a parking slot is
     *         unavailable
     */
    public int getNextAvailableSlot(final ParkingType parkingType) {

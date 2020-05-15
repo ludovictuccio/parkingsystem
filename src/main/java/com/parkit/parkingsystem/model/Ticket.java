@@ -13,11 +13,11 @@ public class Ticket {
    /**
     * The parking entry time.
     */
-   private LocalDateTime inTime;
+   private LocalDateTime inTimeTicket;
    /**
     * The parking exit time.
     */
-   private LocalDateTime outTime;
+   private LocalDateTime outTimeTicket;
    /**
     * The vehicle registration number.
     */
@@ -38,7 +38,7 @@ public class Ticket {
    /**
     * Getter of id ticket.
     *
-    * @return int id ticket
+    * @return id ticket, an int
     */
    public int getId() {
       return id;
@@ -110,10 +110,10 @@ public class Ticket {
    /**
     * Getter of ticket inTime.
     *
-    * @return inTime the ticket entry time
+    * @return inTimeTicket the ticket entry time
     */
    public LocalDateTime getInTime() {
-      return inTime;
+      return inTimeTicket;
    }
 
    /**
@@ -122,16 +122,16 @@ public class Ticket {
     * @param ticketInTime the LocalDateTime of ticket entry time
     */
    public void setInTime(final LocalDateTime ticketInTime) {
-      this.inTime = ticketInTime;
+      this.inTimeTicket = ticketInTime;
    }
 
    /**
     * Getter of ticket outTime.
     *
-    * @return outTime the ticket exit time
+    * @return outTimeTicket the ticket exit time
     */
    public LocalDateTime getOutTime() {
-      return outTime;
+      return outTimeTicket;
    }
 
    /**
@@ -140,6 +140,6 @@ public class Ticket {
     * @param ticketOutTime the LocalDateTime of ticket exit time
     */
    public void setOutTime(final LocalDateTime ticketOutTime) {
-      this.outTime = ticketOutTime;
+      this.outTimeTicket = ticketOutTime;
    }
 }

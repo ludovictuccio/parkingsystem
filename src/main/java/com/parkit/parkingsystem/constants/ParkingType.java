@@ -1,7 +1,7 @@
 package com.parkit.parkingsystem.constants;
 
 /**
- * This enumeration contains the different parking type.
+ * This enumerations contains the different parking type.
  */
 public enum ParkingType {
    /**

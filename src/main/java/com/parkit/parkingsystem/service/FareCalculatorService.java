@@ -50,8 +50,7 @@ public class FareCalculatorService {
     *
     * @param ticket check NullPointerException
     */
-   private static void checkErrorsWhenVehiculeIsExitingParking(
-               final Ticket ticket) {
+   private static void checksTicketOutTimeErrors(final Ticket ticket) {
       if ((ticket.getOutTime() == null)) {
          throw new NullPointerException(ERROR_MESSAGE
                      + " NullPointerException");
@@ -69,7 +68,9 @@ public class FareCalculatorService {
     * @param isRegularUser boolean
     */
    public void calculateFare(final Ticket ticket, final boolean isRegularUser) {
-      checkErrorsWhenVehiculeIsExitingParking(ticket);
+
+      checksTicketOutTimeErrors(ticket);
+
       double vehicleRatePerHour = 0;
       switch (ticket.getParkingSpot().getParkingType()) {
       case CAR:

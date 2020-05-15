@@ -162,20 +162,20 @@ public class TicketDAO {
     * number.
     *
     * @param vehicleRegNumber the user's vehicle registration number
-    * @return numberVisitsUser the total vehicle visits number
+    * @return numberOfUserVisits the total vehicle visits number
     */
    public int checkNumberVisitsUser(final String vehicleRegNumber) {
       Connection con = null;
       PreparedStatement ps = null;
       ResultSet rs = null;
-      int numberVisitsUser = 0;
+      int numberOfUserVisits = 0;
       try {
          con = dataBaseConfig.getConnection();
          ps = con.prepareStatement(DBConstants.CHECK_EXISTING_OLD_TICKETS);
          ps.setString(1, vehicleRegNumber);
          rs = ps.executeQuery();
          if (rs.next()) {
-            numberVisitsUser = rs.getInt(1);
+            numberOfUserVisits = rs.getInt(1);
          }
       } catch (ClassNotFoundException | SQLException ex) {
          LOGGER.error("Error during check existing old tickets process.", ex);
@@ -184,6 +184,6 @@ public class TicketDAO {
          dataBaseConfig.closeResultSet(rs);
          dataBaseConfig.closePreparedStatement(ps);
       }
-      return numberVisitsUser;
+      return numberOfUserVisits;
    }
 }

@@ -22,97 +22,112 @@ import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 
 /**
- * ParkingDataBase Integration Test
+ * ParkingDataBase Integration Test.
  * 
  * @author Ludovic Tuccio
  */
 @ExtendWith(MockitoExtension.class)
 public class ParkingDataBaseIT {
 
-    private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
-    private static ParkingSpotDAO parkingSpotDAO;
-    private static TicketDAO ticketDAO;
-    private static DataBasePrepareService dataBasePrepareService;
-    private static String vehicleRegNumber = "ABCDEF";
+   private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
+   private static ParkingSpotDAO parkingSpotDAO;
+   private static TicketDAO ticketDAO;
+   private static DataBasePrepareService dataBasePrepareService;
+   private static String vehicleRegNumber = "ABCDEF";
 
-    @Mock
-    private static InputReaderUtil inputReaderUtil;
-    @Mock
-    private static ParkingSpot parkingSpot;
+   @Mock
+   private static InputReaderUtil inputReaderUtil;
+   @Mock
+   private static ParkingSpot parkingSpot;
 
-    /**
-     * Used to mark a half-second breakTime between two methods
-     * 
-     * @throws InterruptedException
-     */
-    private synchronized void halfSecondBreak() throws InterruptedException {
-	final long HALF_SECOND = 500;
-	Thread.sleep(HALF_SECOND);
-    }
+   /**
+    * Used to mark a half-second breakTime between two methods (incoming and
+    * exiting process).
+    *
+    * @throws InterruptedException
+    */
+   private synchronized void halfSecondBreak() throws InterruptedException {
+      final int HALF_SECOND = 500;
+      Thread.sleep(HALF_SECOND);
+   }
 
-    @BeforeAll
-    private static void setUp() throws Exception {
-	parkingSpotDAO = new ParkingSpotDAO();
-	ticketDAO = new TicketDAO();
-	dataBasePrepareService = new DataBasePrepareService();
-	parkingSpotDAO.setDataBaseConfig(dataBaseTestConfig);
-    }
+   @BeforeAll
+   private static void setUp() throws Exception {
+      parkingSpotDAO = new ParkingSpotDAO();
+      ticketDAO = new TicketDAO();
+      dataBasePrepareService = new DataBasePrepareService();
+      parkingSpotDAO.setDataBaseConfig(dataBaseTestConfig);
+   }
 
-    @BeforeEach
-    private void setUpPerTest() throws Exception {
-	dataBasePrepareService.clearDataBaseEntries(); // Clear for independents tests
-	when(inputReaderUtil.readSelection()).thenReturn(1);
-	when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(vehicleRegNumber);
-	ticketDAO.setDataBaseConfig(dataBaseTestConfig);
-    }
+   @BeforeEach
+   private void setUpPerTest() throws Exception {
+      // Clear for independents tests
+      dataBasePrepareService.clearDataBaseEntries();
 
-    @Test
-    @Tag("Incoming")
-    @DisplayName("Check that a ticket is actually saved in DB and Parking table is updated with availability")
-    public void givenAnIncomingVehicle_whenTicketMustBeSavedtoDBAndParkingSpotAvaibilityUpdated_thenGetTicketIsNotNullAndVehiculeParkingSpotUnavailable() {
+      when(inputReaderUtil.readSelection()).thenReturn(1);
+      when(inputReaderUtil.readVehicleRegistrationNumber())
+                  .thenReturn(vehicleRegNumber);
+      ticketDAO.setDataBaseConfig(dataBaseTestConfig);
+   }
 
-	ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+   @Test
+   @Tag("Incoming")
+   @DisplayName("Check that a ticket is actually saved in DB and Parking table is updated with availability")
+   public void givenIncomingVehicle_whenTicketMustBeSavedtoDBAndParkingSpotAvaibilityUpdated_thenGetTicketIsNotNullAndVehiculeParkingSpotUnavailable() {
 
-	parkingService.processIncomingVehicle();
-	parkingSpot = parkingService.getNextParkingNumberIfAvailable();
+      ParkingService parkingService = new ParkingService(inputReaderUtil,
+                  parkingSpotDAO, ticketDAO);
 
-	assertThat(ticketDAO.getTicket(vehicleRegNumber)).isNotNull(); // Check ticket saved in DB
-	assertThat(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR) > 1).isTrue(); // Check vehicle parking spot
-										       // unavailable
-    }
+      parkingService.processIncomingVehicle();
+      parkingSpot = parkingService.getNextParkingNumberIfAvailable();
 
-    @Test
-    @Tag("IncomingAndExiting")
-    @DisplayName("Regular & new user - checkNumberVisitsUser - verify good visits number")
-    public void givenRegularAndNewUser_whenCheckNumberVisitsUserInDB_thenReturnCorrectValue()
-	    throws InterruptedException {
+      // Checks ticket saved in DB
+      assertThat(ticketDAO.getTicket(vehicleRegNumber)).isNotNull();
+      // Checks vehicle parking spot unavailable
+      assertThat(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR) > 1)
+                  .isTrue();
+   }
 
-	ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+   @Test
+   @Tag("IncomingAndExiting")
+   @DisplayName("Regular & new user - checkNumberVisitsUser - verify good visits number")
+   public void givenRegularAndNewUser_whenCheckNumberVisitsUserInDB_thenReturnCorrectValue()
+               throws InterruptedException {
 
-	parkingService.processIncomingVehicle();
-	halfSecondBreak();
-	parkingService.processExitingVehicle();
-	int numberTotalVisitsRegularUser = ticketDAO.checkNumberVisitsUser(vehicleRegNumber);
-	int numberTotalVisitsNewUser = ticketDAO.checkNumberVisitsUser("012345");
+      ParkingService parkingService = new ParkingService(inputReaderUtil,
+                  parkingSpotDAO, ticketDAO);
 
-	assertThat(1).isEqualTo(numberTotalVisitsRegularUser); // Check that tickets are saved in DB
-	assertThat(0).isEqualTo(numberTotalVisitsNewUser);
-    }
+      parkingService.processIncomingVehicle();
+      halfSecondBreak();
+      parkingService.processExitingVehicle();
+      int numberTotalVisitsRegularUser = ticketDAO
+                  .checkNumberVisitsUser(vehicleRegNumber);
+      int numberTotalVisitsNewUser = ticketDAO.checkNumberVisitsUser("012345");
 
-    @Test
-    @Tag("IncomingAndExiting")
-    @DisplayName("Check that the fare generated and out time are populated correctly in the database")
-    public void givenAnExitingVehicle_whenTheSystemProcessesIt_thenOutTimeShouldBeSavedToDBAndPriceAtZeroForLessThanThirtyMinutesParked()
-	    throws InterruptedException {
+      // Check that tickets are saved in DB
+      assertThat(1).isEqualTo(numberTotalVisitsRegularUser);
+      assertThat(0).isEqualTo(numberTotalVisitsNewUser);
+   }
 
-	ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+   @Test
+   @Tag("IncomingAndExiting")
+   @DisplayName("Check that the fare generated and out time are populated correctly in the DB")
+   public void givenExitingVehicle_whenSystemProcess_thenOutTimeShouldBeSavedToDBAndPriceAtZeroForLessThanThirtyMinutesParked()
+               throws InterruptedException {
 
-	parkingService.processIncomingVehicle();
-	halfSecondBreak();
-	parkingService.processExitingVehicle();
+      ParkingService parkingService = new ParkingService(inputReaderUtil,
+                  parkingSpotDAO, ticketDAO);
 
-	assertThat(ticketDAO.getTicket(vehicleRegNumber).getOutTime()).isNotNull();
-	assertThat(ticketDAO.getTicket(vehicleRegNumber).getPrice()).isNotNull(); // Verify that exit process work
-	assertThat(ticketDAO.getTicket(vehicleRegNumber).getPrice()).isEqualTo(0.0);
-    }
+      parkingService.processIncomingVehicle();
+      halfSecondBreak();
+      parkingService.processExitingVehicle();
+
+      assertThat(ticketDAO.getTicket(vehicleRegNumber).getOutTime())
+                  .isNotNull();
+      // Verify that exit process work
+      assertThat(ticketDAO.getTicket(vehicleRegNumber).getPrice()).isNotNull();
+
+      assertThat(ticketDAO.getTicket(vehicleRegNumber).getPrice())
+                  .isEqualTo(0.0);
+   }
 }
